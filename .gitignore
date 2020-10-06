@@ -1,0 +1,7 @@
+# object files
+build
+
+# executables
+game
+game.exe
+
