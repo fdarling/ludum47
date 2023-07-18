@@ -1,6 +1,8 @@
 #pragma once
 
-#include <Box2D/Common/b2Draw.h>
+// #include <Box2D/Common/b2Draw.h>
+#include <box2d/b2_draw.h>
+#include <stdint.h>
 
 class DrawPhysics : public b2Draw
 {
