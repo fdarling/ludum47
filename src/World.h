@@ -1,7 +1,8 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include <Box2D/Box2D.h>
+// #include <Box2D/Box2D.h>
+#include <box2d/box2d.h>
 
 #include "Point.h"
 #include "DrawPhysics.h"
