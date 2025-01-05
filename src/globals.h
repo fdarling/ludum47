@@ -2,7 +2,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <Box2D/Box2D.h>
+#include <box2d/b2_world.h>
 
 #include "Rect.h"
 // #include "Physics.h"
@@ -22,8 +22,8 @@ static const int ATLAS_COLS = 2;
 
 namespace Physics {
 
-static const float32 METERS_PER_PIXEL =  0.0254; // 1 inch in meters
-static const float32 PIXELS_PER_METER = 39.3701; // 1 meter in inches
+static const float METERS_PER_PIXEL =  0.0254; // 1 inch in meters
+static const float PIXELS_PER_METER = 39.3701; // 1 meter in inches
 
 extern b2World world;
 

@@ -1,6 +1,8 @@
 #include "ContactListener.h"
 #include "globals.h"
 
+#include <box2d/b2_contact.h>
+
 // #include <iostream>
 
 static int count = 0;

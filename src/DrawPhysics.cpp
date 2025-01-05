@@ -38,7 +38,7 @@ void DrawPhysics::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, co
     // std::cout << "DrawSolidPolygon " << vertices[0].x << ", " << vertices[0].y << std::endl;
 }
 
-void DrawPhysics::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
+void DrawPhysics::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
     const int x = center.x*Physics::PIXELS_PER_METER - camera.pos.x;
     const int y = center.y*Physics::PIXELS_PER_METER - camera.pos.y;
@@ -50,7 +50,7 @@ void DrawPhysics::DrawCircle(const b2Vec2& center, float32 radius, const b2Color
     // std::cout << "DrawCircle" << std::endl;
 }
 
-void DrawPhysics::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
+void DrawPhysics::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
     filledCircleRGBA(renderer, center.x*Physics::PIXELS_PER_METER - camera.pos.x, center.y*Physics::PIXELS_PER_METER - camera.pos.y, radius*Physics::PIXELS_PER_METER, color.r*255.0, color.g*255.0, color.b*255.0, color.a*255.0);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, color.a*255.0);
@@ -72,4 +72,13 @@ void DrawPhysics::DrawTransform(const b2Transform& xf)
 {
     (void)xf;
     // std::cout << "DrawTransform" << std::endl;
+}
+
+void DrawPhysics::DrawPoint(const b2Vec2 &p, float size, const b2Color &color)
+{
+    (void)p;
+    (void)size;
+    (void)color;
+
+    // TODO
 }

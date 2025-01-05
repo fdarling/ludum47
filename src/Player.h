@@ -1,11 +1,9 @@
 #pragma once
 
-#include <Box2D/Box2D.h>
+#include <box2d/b2_body.h>
+#include <box2d/b2_fixture.h>
 
 #include "Rect.h"
-
-// #include <BulletCollision/CollisionShapes/btCollisionShape.h>
-// #include <BulletDynamics/Dynamics/btRigidBody.h>
 
 class Player
 {
@@ -24,8 +22,6 @@ public:
     int _frameIndex;
     bool _walkingLeft;
     Point _lastPos;
-    // btCollisionShape *shape;
-    // btRigidBody *body;
     b2Body *body;
     b2Fixture *fixture;
     bool touchingGround;

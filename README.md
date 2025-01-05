@@ -11,7 +11,7 @@ https://ldjam.com/events/ludum-dare/47/theme
 * [SDL2_gfx](https://www.ferzkopp.net/wordpress/2016/01/02/sdl_gfx-sdl2_gfx/)
 * [Box2D](https://box2d.org/)
 
-To install these dependencies under Ubuntu:
+To install these dependencies under Ubuntu or Debian:
 
 ```sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-gfx-dev libbox2d-dev```
 

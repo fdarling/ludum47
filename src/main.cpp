@@ -4,9 +4,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-// #include <Box2D/Box2D.h>
-// b2Vec2 gravity;
-
 #include <cstdio>
 #include <cstring>
 #include <stdint.h>
@@ -75,7 +72,7 @@ static bool main_loop()
     player.draw(camera.pos);
 
     // process physics (done here because of debug output)
-    Physics::world.DrawDebugData();
+    Physics::world.DebugDraw();
     world.advance();
     player.advance();
 

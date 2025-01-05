@@ -1,4 +1,7 @@
-#include <Box2D/Box2D.h>
+#pragma once
+
+#include <box2d/b2_body.h>
+#include <box2d/b2_fixture.h>
 
 #include <vector>
 

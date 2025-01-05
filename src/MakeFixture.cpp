@@ -1,6 +1,8 @@
 #include "MakeFixture.h"
 #include "globals.h"
 
+#include <box2d/b2_polygon_shape.h>
+
 void MakeFixture(b2Body *body, std::vector<b2Vec2> points)
 {
     for (std::size_t i = 0; i < points.size(); i++)

@@ -3,6 +3,8 @@
 //#include "MakeFixture.h" // TODO
 #include "globals.h"
 
+#include <box2d/b2_polygon_shape.h>
+
 Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _lastPos(rect.topLeft()), touchingGround(false)
 {
     b2BodyDef bodyDef;
@@ -10,7 +12,7 @@ Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingT
     bodyDef.fixedRotation = true;
     bodyDef.position.Set(rect.x * Physics::METERS_PER_PIXEL, rect.y * Physics::METERS_PER_PIXEL);
     body = Physics::world.CreateBody(&bodyDef);
-    body->SetUserData(this);
+    body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 
     b2PolygonShape dynamicBox;
     dynamicBox.SetAsBox(((rect.w - 4) * Physics::METERS_PER_PIXEL)/2.0, (2 * Physics::METERS_PER_PIXEL)/2.0, b2Vec2(0.0, (rect.h/2 - 2) * Physics::METERS_PER_PIXEL), 0.0);
