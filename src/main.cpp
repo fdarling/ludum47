@@ -8,6 +8,7 @@
 #include <cstring>
 #include <stdint.h>
 #include <iostream>
+#include <filesystem>
 
 #include "Line.h"
 #include "globals.h"
@@ -112,6 +113,25 @@ int main(int, char **)
         std::cout << pt << ' ' << a << ' ' << b << std::endl; // should say (30, 17)
         // return 0;
     }*/
+
+    {
+        const std::string TEST_DIR = "assets";
+        const std::filesystem::path current_directory = std::filesystem::current_path();
+        const std::filesystem::path current_directory_parent = current_directory.parent_path();
+        const std::filesystem::path location1 = current_directory / TEST_DIR;
+        const std::filesystem::path location2 = current_directory_parent / TEST_DIR;
+
+        if (!std::filesystem::is_directory(location1))
+        {
+            std::filesystem::current_path(current_directory_parent);
+            if (!std::filesystem::is_directory(location2))
+            {
+                fprintf(stderr, "couldn't find the \"%s\" directory at either of the following locations:\n\"%s\"\n\"%s\"\n", TEST_DIR.c_str(), location1.c_str(), location2.c_str());
+                return -1;
+            }
+        }
+    }
+
     // initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {

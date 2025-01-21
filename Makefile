@@ -25,7 +25,7 @@ SOURCES = \
 	src/Line.cpp \
 	src/Camera.cpp \
 	src/main.cpp
-BUILDIR = build
+BUILDIR = make_build
 OBJECTS += $(addprefix $(BUILDIR)/,$(addsuffix .o,$(basename $(SOURCES))))
 
 all: $(TARGET)
