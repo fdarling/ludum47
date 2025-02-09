@@ -14,6 +14,10 @@ public:
     RectBase(Real xx, Real yy, Real ww, Real hh) : x(xx), y(yy), w(ww), h(hh)
     {
     }
+    RectBase scaled(const Real &scalar) const
+    {
+        return RectBase<Real>(x*scalar, y*scalar, w*scalar, h*scalar);
+    }
     RectBase translated(const PointBase<Real> &pt) const
     {
         return RectBase<Real>(x + pt.x, y + pt.y, w, h);

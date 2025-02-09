@@ -15,19 +15,14 @@ Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingT
     body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 
     b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(((rect.w - 4) * Physics::METERS_PER_PIXEL)/2.0, (2 * Physics::METERS_PER_PIXEL)/2.0, b2Vec2(0.0, (rect.h/2 - 2) * Physics::METERS_PER_PIXEL), 0.0);
+    dynamicBox.SetAsBox((rect.w * Physics::METERS_PER_PIXEL)/2.0, (rect.h * Physics::METERS_PER_PIXEL)/2.0, b2Vec2(0.0, 0.0), 0.0);
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicBox;
     fixtureDef.density = 1.0;
-    fixtureDef.friction = 2;
+    fixtureDef.friction = 2.0;
 
     fixture = body->CreateFixture(&fixtureDef);
-    // fixture->SetFriction(100.0);
-
-    fixtureDef.friction = 0.0;
-    dynamicBox.SetAsBox((rect.w * Physics::METERS_PER_PIXEL)/2.0, ((rect.h - 4) * Physics::METERS_PER_PIXEL)/2.0, b2Vec2(0.0, -2 * Physics::METERS_PER_PIXEL), 0.0);
-    body->CreateFixture(&fixtureDef);
 }
 
 Player::~Player()
@@ -49,7 +44,12 @@ void Player::walkLeft()
 {
     b2Vec2 vel = player.body->GetLinearVelocity();
     vel.x = -3.0;
-    body->SetLinearVelocity(vel);
+    // if (!standing_on.empty())
+    if (!standing_on.empty() || blocked_left_by.empty())
+    {
+        // std::cout << "SETTING LEFT VEL" << std::endl;
+        body->SetLinearVelocity(vel);
+    }
     _walkingLeft = true;
 }
 
@@ -57,7 +57,12 @@ void Player::walkRight()
 {
     b2Vec2 vel = player.body->GetLinearVelocity();
     vel.x = 3.0;
-    body->SetLinearVelocity(vel);
+    // if (!standing_on.empty())
+    if (!standing_on.empty() || blocked_right_by.empty())
+    {
+        // std::cout << "SETTING RIGHT VEL" << std::endl;
+        body->SetLinearVelocity(vel);
+    }
     _walkingLeft = false;
 }
 
@@ -67,6 +72,12 @@ void Player::jump()
     {
         b2Vec2 vel = player.body->GetLinearVelocity();
         vel.y = -4.0;
+        // HACK
+        if (vel.x < 0 && !blocked_left_by.empty())
+            vel.x = 0;
+        if (vel.x > 0 && !blocked_right_by.empty())
+            vel.x = 0;
+        // fixture->SetFriction(0.0);
         body->SetLinearVelocity(vel);
     }
 }
@@ -101,4 +112,21 @@ void Player::draw(const Point &offset) const
         // SDL_QueryTexture(_walkingTexture, NULL, NULL, &w, &h);
         SDL_RenderCopyEx(renderer, _walkingTexture, &src, &dst, 0.0, NULL, _walkingLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
     }
+    /*if (touchingGround)
+    {
+        for (int i = 0; i < 1; i++)
+        {
+            printf("%d: %f, %f\n", i, contactWorldManifold.points[i].x, contactWorldManifold.points[i].y);
+            const RectF r = RectF(contactWorldManifold.points[i].x-4, contactWorldManifold.points[i].y-4, 8, 8).scaled(Physics::PIXELS_PER_METER);//.translated(-offset);
+            // const RectF r = RectF(contactWorldManifold.points[i].x, contactWorldManifold.points[i].y, 1, 1);
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            const SDL_Rect dst2 = r.translated(-offset).toSDL();
+            printf("\tdsta: %d, %d\n", rect.x, rect.y);
+            printf("\tdstb: %f, %f\n", r.x, r.y);
+            printf("\tdst1: %i, %i\n", dst.x, dst.y);
+            printf("\tdst2: %i, %i\n", dst2.x, dst2.y);
+            // SDL_RenderDrawRect(renderer, &dst);
+            SDL_RenderDrawRect(renderer, &dst2);
+        }
+    }*/
 }

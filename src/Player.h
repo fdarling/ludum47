@@ -5,6 +5,8 @@
 
 #include "Rect.h"
 
+#include <set>
+
 class Player
 {
 public:
@@ -25,4 +27,7 @@ public:
     b2Body *body;
     b2Fixture *fixture;
     bool touchingGround;
+    std::set<b2Fixture*> standing_on;
+    std::set<b2Fixture*> blocked_left_by;
+    std::set<b2Fixture*> blocked_right_by;
 };
