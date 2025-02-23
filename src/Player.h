@@ -18,6 +18,7 @@ public:
     void jump();
     void advance();
     void draw(const Point &offset) const;
+    bool isStandingOnGround() const {return !standing_on.empty();}
     Rect rect;
     // SDL_Texture *_standingTexture;
     SDL_Texture *_walkingTexture;
@@ -26,8 +27,5 @@ public:
     Point _lastPos;
     b2Body *body;
     b2Fixture *fixture;
-    bool touchingGround;
     std::set<b2Fixture*> standing_on;
-    std::set<b2Fixture*> blocked_left_by;
-    std::set<b2Fixture*> blocked_right_by;
 };

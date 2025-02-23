@@ -5,7 +5,7 @@
 
 #include <box2d/b2_polygon_shape.h>
 
-Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _lastPos(rect.topLeft()), touchingGround(false)
+Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _lastPos(rect.topLeft())
 {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
@@ -45,7 +45,7 @@ void Player::walkLeft()
     b2Vec2 vel = player.body->GetLinearVelocity();
     vel.x = -3.0;
     // if (!standing_on.empty())
-    if (!standing_on.empty() || blocked_left_by.empty())
+    // if (!standing_on.empty() || blocked_left_by.empty())
     {
         // std::cout << "SETTING LEFT VEL" << std::endl;
         body->SetLinearVelocity(vel);
@@ -58,7 +58,7 @@ void Player::walkRight()
     b2Vec2 vel = player.body->GetLinearVelocity();
     vel.x = 3.0;
     // if (!standing_on.empty())
-    if (!standing_on.empty() || blocked_right_by.empty())
+    // if (!standing_on.empty() || blocked_right_by.empty())
     {
         // std::cout << "SETTING RIGHT VEL" << std::endl;
         body->SetLinearVelocity(vel);
@@ -68,16 +68,10 @@ void Player::walkRight()
 
 void Player::jump()
 {
-    if (touchingGround)
+    if (isStandingOnGround())
     {
         b2Vec2 vel = player.body->GetLinearVelocity();
         vel.y = -4.0;
-        // HACK
-        if (vel.x < 0 && !blocked_left_by.empty())
-            vel.x = 0;
-        if (vel.x > 0 && !blocked_right_by.empty())
-            vel.x = 0;
-        // fixture->SetFriction(0.0);
         body->SetLinearVelocity(vel);
     }
 }
