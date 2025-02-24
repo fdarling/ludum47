@@ -40,7 +40,7 @@ static bool main_loop()
         }
     }
     // process buttons being held
-    {
+    // {
         const Uint8 * const keys = SDL_GetKeyboardState(NULL);
              if ((keys[SDL_SCANCODE_D] && !keys[SDL_SCANCODE_A])
               || (keys[SDL_SCANCODE_RIGHT] && !keys[SDL_SCANCODE_LEFT]))
@@ -56,7 +56,7 @@ static bool main_loop()
         {
             player.jump();
         }
-    }
+    // }
 
     // sychronize the camera to the player
     camera.pos.x = -SCREEN_WIDTH /2 + player.rect.x + player.rect.w/2;
@@ -74,6 +74,19 @@ static bool main_loop()
 
     // process physics (done here because of debug output)
     Physics::world.DebugDraw();
+    if (keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT])
+    {
+        // experimental "jetpack" feature
+        const b2Vec2 vel = player.body->GetLinearVelocity();
+        const float mass = player.body->GetMass();
+        static const float MAX_JETPACK_FORCE = 20.0; // not including the gravity counteracting force
+        static const float MAX_JETPACK_SPEED = 5;
+        float extra = std::max(0.0, MAX_JETPACK_FORCE*(1.0 + vel.y/MAX_JETPACK_SPEED));
+        player.body->ApplyForceToCenter(b2Vec2(0.0, (-9.8f - extra) * mass), true);
+        // NOTE: this is to fix a bug where the body will sleep with
+        // the "jetpack on" and it won't notice when it turns off...
+        player.body->SetAwake(true);
+    }
     world.advance();
     player.advance();
 
