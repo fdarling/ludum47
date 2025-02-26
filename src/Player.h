@@ -2,6 +2,8 @@
 
 #include <box2d/b2_body.h>
 #include <box2d/b2_fixture.h>
+#include <box2d/b2_edge_shape.h>
+#include <box2d/b2_joint.h>
 
 #include "Rect.h"
 
@@ -16,6 +18,7 @@ public:
     void walkLeft();
     void walkRight();
     void setJetpack(bool on);
+    void setGrappling(bool on);
     void jump();
     void advance();
     void draw(const Point &offset) const;
@@ -30,5 +33,7 @@ public:
     Point _lastPos;
     b2Body *body;
     b2Fixture *fixture;
+    b2Joint *hanging_joint;
     std::set<b2Fixture*> standing_on;
+    std::set<b2EdgeShape*> hanging_under;
 };

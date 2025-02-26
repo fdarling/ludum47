@@ -57,6 +57,7 @@ static bool main_loop()
             player.jump();
         }
         player.setJetpack(keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT]);
+        player.setGrappling(keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]);
     }
 
     // sychronize the camera to the player

@@ -4,8 +4,9 @@
 #include "globals.h"
 
 #include <box2d/b2_polygon_shape.h>
+#include <box2d/b2_prismatic_joint.h>
 
-Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _jetpackOn(false), _grappling(false), _lastPos(rect.topLeft())
+Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _jetpackOn(false), _grappling(false), _lastPos(rect.topLeft()), body(nullptr), fixture(nullptr), hanging_joint(nullptr)
 {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
@@ -71,6 +72,11 @@ void Player::setJetpack(bool on)
     _jetpackOn = on;
 }
 
+void Player::setGrappling(bool on)
+{
+    _grappling = on;
+}
+
 void Player::jump()
 {
     if (isStandingOnGround())
@@ -102,6 +108,38 @@ void Player::advance()
         static const float MAX_JETPACK_SPEED = 5;
         float extra = std::max(0.0, MAX_JETPACK_FORCE*(1.0 + vel.y/MAX_JETPACK_SPEED));
         body->ApplyForceToCenter(b2Vec2(0.0, (-9.8f - extra) * mass), true);
+    }
+
+    if (!_grappling && hanging_joint)
+    {
+        Physics::world.DestroyJoint(hanging_joint);
+        hanging_joint = nullptr;
+    }
+    else if (_grappling && !hanging_joint && !hanging_under.empty())
+    {
+        const b2Vec2 &player_pos = body->GetPosition();
+        const float player_width = (rect.w * Physics::METERS_PER_PIXEL);
+        const float player_height = (rect.h * Physics::METERS_PER_PIXEL);
+        b2EdgeShape * const edge_shape = *hanging_under.begin();
+
+        // calculate the direction unit vector of the edge
+        b2Vec2 dir = edge_shape->m_vertex1 - edge_shape->m_vertex2;
+        const float edge_len = dir.Normalize();
+
+        // calculate the top-middle of the player
+        const b2Vec2 player_top_middle = player_pos + b2Vec2(0.0, -player_height/2.0);
+        b2Vec2 player_top_dir = player_top_middle - edge_shape->m_vertex2;
+        const float player_distance = player_top_dir.Normalize();
+
+        b2PrismaticJointDef testJointDef;
+        testJointDef.Initialize(world.groundBody, player.body, player_top_middle, dir);
+        testJointDef.enableLimit = true;
+        testJointDef.lowerTranslation = -player_distance + player_width/2.0;
+        testJointDef.upperTranslation = -player_distance + edge_len - player_width/2.0;
+        if (testJointDef.lowerTranslation > testJointDef.upperTranslation)
+            std::swap(testJointDef.lowerTranslation, testJointDef.upperTranslation);
+        if (player_distance >= player_width/2.0 && player_distance <= edge_len - player_width/2.0)
+            hanging_joint = Physics::world.CreateJoint(&testJointDef);
     }
 }
 

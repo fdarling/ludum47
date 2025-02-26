@@ -2,6 +2,7 @@
 #include "globals.h"
 
 #include <box2d/b2_contact.h>
+#include <box2d/b2_edge_shape.h>
 
 // #include <iostream>
 
@@ -22,12 +23,28 @@ void ContactListener::BeginContact(b2Contact* contact)
         if (contactWorldManifold.normal.y < 0.0 && contactWorldManifold.normal.y < -0.4)
         {
             player.standing_on.insert(floor_fixture);
-            contact->SetFriction(0.5);
+            contact->SetFriction(0.95);
         }
         else
         {
             player.standing_on.erase(floor_fixture);
             contact->SetFriction(0.0);
+        }
+
+        if (contactWorldManifold.normal.y > 0.4)
+        {
+            // std::cout << "Hit Ceiling!" << std::endl;
+            b2Shape * const generic_shape = floor_fixture->GetShape();
+            if (generic_shape->GetType() == b2Shape::e_edge)
+            {
+                b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
+
+                b2Vec2 dir = edge_shape->m_vertex2 - edge_shape->m_vertex1;
+                dir.Normalize();
+
+                if (std::abs(dir.y) < 0.01)
+                    player.hanging_under.insert(edge_shape);
+            }
         }
 
         // std::cout << contactWorldManifold.normal.x << "," << contactWorldManifold.normal.y << std::endl;
@@ -45,5 +62,12 @@ void ContactListener::EndContact(b2Contact* contact)
         // player->endContact();
         b2Fixture * const floor_fixture = aMatches ? contact->GetFixtureB() : contact->GetFixtureA();
         player.standing_on.erase(floor_fixture);
+
+        b2Shape * const generic_shape = floor_fixture->GetShape();
+        if (generic_shape->GetType() == b2Shape::e_edge)
+        {
+            b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
+            player.hanging_under.erase(edge_shape);
+        }
     }
 }
