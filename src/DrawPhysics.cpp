@@ -74,5 +74,6 @@ void DrawPhysics::DrawTransform(const b2Transform& xf)
 void DrawPhysics::DrawPoint(const b2Vec2 &p, float size, const b2Color &color)
 {
     filledCircleRGBA(renderer, p.x*Physics::PIXELS_PER_METER - camera.pos.x, p.y*Physics::PIXELS_PER_METER - camera.pos.y, size/2.0, color.r*255.0, color.g*255.0, color.b*255.0, color.a*255.0);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND); // HACK, the above function messes with this renderer state :-(
     // std::cout << "DrawPoint" << std::endl;
 }
