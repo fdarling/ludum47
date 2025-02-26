@@ -15,6 +15,7 @@ public:
     bool init();
     void walkLeft();
     void walkRight();
+    void setJetpack(bool on);
     void jump();
     void advance();
     void draw(const Point &offset) const;
@@ -24,6 +25,8 @@ public:
     SDL_Texture *_walkingTexture;
     int _frameIndex;
     bool _walkingLeft;
+    bool _jetpackOn;
+    bool _grappling;
     Point _lastPos;
     b2Body *body;
     b2Fixture *fixture;

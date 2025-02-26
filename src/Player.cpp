@@ -5,7 +5,7 @@
 
 #include <box2d/b2_polygon_shape.h>
 
-Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _lastPos(rect.topLeft())
+Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _jetpackOn(false), _grappling(false), _lastPos(rect.topLeft())
 {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
@@ -66,6 +66,11 @@ void Player::walkRight()
     _walkingLeft = false;
 }
 
+void Player::setJetpack(bool on)
+{
+    _jetpackOn = on;
+}
+
 void Player::jump()
 {
     if (isStandingOnGround())
@@ -87,6 +92,16 @@ void Player::advance()
         _frameIndex++;
         if (_frameIndex >= 16)
             _frameIndex = 0;
+    }
+
+    if (_jetpackOn)
+    {
+        const b2Vec2 vel = body->GetLinearVelocity();
+        const float mass = body->GetMass();
+        static const float MAX_JETPACK_FORCE = 20.0; // not including the gravity counteracting force
+        static const float MAX_JETPACK_SPEED = 5;
+        float extra = std::max(0.0, MAX_JETPACK_FORCE*(1.0 + vel.y/MAX_JETPACK_SPEED));
+        body->ApplyForceToCenter(b2Vec2(0.0, (-9.8f - extra) * mass), true);
     }
 }
 
