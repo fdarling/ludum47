@@ -4,7 +4,7 @@
 #include "SDL2_gfxPrimitives.h"
 
 #include <vector>
-#include <iostream>
+// #include <iostream>
 
 void DrawPhysics::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
@@ -19,7 +19,7 @@ void DrawPhysics::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b
     }
     SDL_SetRenderDrawColor(renderer, color.r*255.0, color.g*255.0, color.b*255.0, color.a*255.0);
     SDL_RenderDrawLines(renderer, points.data(), vertexCount);
-    std::cout << "DrawPolygon" << std::endl;
+    // std::cout << "DrawPolygon" << std::endl;
 }
 
 void DrawPhysics::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -60,11 +60,8 @@ void DrawPhysics::DrawSolidCircle(const b2Vec2& center, float radius, const b2Ve
 
 void DrawPhysics::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-    (void)p1;
-    (void)p2;
-    (void)color;
-    // SDL_SetRenderDrawColor(renderer, color.r*255.0, color.g*255.0, color.b*255.0, color.a*255.0);
-    // SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
+    SDL_SetRenderDrawColor(renderer, color.r*255.0, color.g*255.0, color.b*255.0, color.a*255.0);
+    SDL_RenderDrawLine(renderer, p1.x*Physics::PIXELS_PER_METER - camera.pos.x, p1.y*Physics::PIXELS_PER_METER - camera.pos.y, p2.x*Physics::PIXELS_PER_METER - camera.pos.x, p2.y*Physics::PIXELS_PER_METER - camera.pos.y);
     // std::cout << "DrawSegment" << std::endl;
 }
 
@@ -76,9 +73,6 @@ void DrawPhysics::DrawTransform(const b2Transform& xf)
 
 void DrawPhysics::DrawPoint(const b2Vec2 &p, float size, const b2Color &color)
 {
-    (void)p;
-    (void)size;
-    (void)color;
-
-    // TODO
+    filledCircleRGBA(renderer, p.x*Physics::PIXELS_PER_METER - camera.pos.x, p.y*Physics::PIXELS_PER_METER - camera.pos.y, size/2.0, color.r*255.0, color.g*255.0, color.b*255.0, color.a*255.0);
+    // std::cout << "DrawPoint" << std::endl;
 }
