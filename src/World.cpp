@@ -21,7 +21,7 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
     points.emplace_back(  0.0, 900.0);
     MakeFixture(groundBody, points);
     
-    // add small platform #2
+    // add small platform #1
     points.clear();
     points.emplace_back(0.0, 784.0);
     points.emplace_back(0.0, 768.0);
@@ -51,6 +51,14 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
     points.emplace_back(160.0, 704.0);
     points.emplace_back(192.0, 704.0);
     points.emplace_back(192.0, 720.0);
+    MakeFixture(groundBody, points);
+    
+    // add large platform #5
+    points.clear();
+    points.emplace_back(160.0, 720.0 - 64.0);
+    points.emplace_back(160.0, 704.0 - 64.0);
+    points.emplace_back(288.0, 704.0 - 64.0);
+    points.emplace_back(288.0, 720.0 - 64.0);
     MakeFixture(groundBody, points);
 
     // add hill #1
