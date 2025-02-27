@@ -123,27 +123,41 @@ void Player::advance()
         b2EdgeShape * const edge_shape = *hanging_under.begin();
 
         // calculate the direction unit vector of the edge
-        b2Vec2 dir = edge_shape->m_vertex1 - edge_shape->m_vertex2;
-        const float edge_len = dir.Normalize();
+        b2Vec2 edge_dir = edge_shape->m_vertex2 - edge_shape->m_vertex1;
+        const float edge_len = edge_dir.Normalize();
 
-        // calculate the top-middle of the player
-        const b2Vec2 player_top_middle = player_pos + b2Vec2(0.0, -player_height/2.0);
-        b2Vec2 player_top_dir = player_top_middle - edge_shape->m_vertex2;
-        const float player_distance = player_top_dir.Normalize();
+        // calculate where the top-middle of the player would end up along the edge
+        const b2Vec2 grab_point = b2Vec2(player_pos.x, edge_shape->m_vertex1.y);
+        b2Vec2 grab_point_dir = grab_point - edge_shape->m_vertex1;
+        const float grab_point_distance = grab_point_dir.Normalize();
 
         // calculate the dot product to determine if we are facing the same direction as the edge direction vector
         // this is needed to make sure that length checking is talking about the same direction (sign error)
-        const float player_dot_product = b2Dot(player_top_dir, dir);
+        const float grab_dot_product = b2Dot(grab_point_dir, edge_dir);
 
-        b2PrismaticJointDef testJointDef;
-        testJointDef.Initialize(world.groundBody, player.body, player_top_middle, dir);
-        testJointDef.enableLimit = true;
-        testJointDef.lowerTranslation = -player_distance + player_width/2.0;
-        testJointDef.upperTranslation = -player_distance + edge_len - player_width/2.0;
-        if (testJointDef.lowerTranslation > testJointDef.upperTranslation)
-            std::swap(testJointDef.lowerTranslation, testJointDef.upperTranslation);
-        if (player_dot_product >= 0.0 && player_distance >= player_width/2.0 && player_distance <= edge_len - player_width/2.0)
+        const float grab_start_distance = player_width/2.0;
+        const float grab_end_distance   = edge_len - player_width/2.0;
+        const bool same_direction = (grab_dot_product >= 0.0);
+        const bool within_range = (grab_point_distance >= grab_start_distance && grab_point_distance <= grab_end_distance);
+        // std::cout << "same_direction = " << (int)same_direction << ", within_range = " << (int)within_range << std::endl;
+        // std::cout << "grab_point = (" << grab_point.x << ", " << grab_point.y << "); grab_point_dir = (" << grab_point_dir.x << ", " << grab_point_dir.y << "); edge_dir = (" << edge_dir.x << ", " << edge_dir.y << ")" << std::endl;
+
+        if (same_direction && within_range)
+        {
+            // make sure the player is initially "snapped" to the hanging position
+            // const b2Vec2 snapped_player_pos(grab_point.x, grab_point.y + player_height/2.0);
+            // player.body->SetTransform(snapped_player_pos, player.body->GetAngle());
+
+            // constraint the player to the ceiling
+            b2PrismaticJointDef testJointDef;
+            testJointDef.Initialize(world.groundBody, player.body, grab_point, edge_dir);
+            testJointDef.enableLimit = true;
+            testJointDef.lowerTranslation = -grab_point_distance + grab_start_distance;
+            testJointDef.upperTranslation = -grab_point_distance + grab_end_distance;
+            if (testJointDef.lowerTranslation > testJointDef.upperTranslation)
+                std::swap(testJointDef.lowerTranslation, testJointDef.upperTranslation);
             hanging_joint = Physics::world.CreateJoint(&testJointDef);
+        }
     }
 }
 
