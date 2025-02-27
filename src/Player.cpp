@@ -131,6 +131,10 @@ void Player::advance()
         b2Vec2 player_top_dir = player_top_middle - edge_shape->m_vertex2;
         const float player_distance = player_top_dir.Normalize();
 
+        // calculate the dot product to determine if we are facing the same direction as the edge direction vector
+        // this is needed to make sure that length checking is talking about the same direction (sign error)
+        const float player_dot_product = b2Dot(player_top_dir, dir);
+
         b2PrismaticJointDef testJointDef;
         testJointDef.Initialize(world.groundBody, player.body, player_top_middle, dir);
         testJointDef.enableLimit = true;
@@ -138,7 +142,7 @@ void Player::advance()
         testJointDef.upperTranslation = -player_distance + edge_len - player_width/2.0;
         if (testJointDef.lowerTranslation > testJointDef.upperTranslation)
             std::swap(testJointDef.lowerTranslation, testJointDef.upperTranslation);
-        if (player_distance >= player_width/2.0 && player_distance <= edge_len - player_width/2.0)
+        if (player_dot_product >= 0.0 && player_distance >= player_width/2.0 && player_distance <= edge_len - player_width/2.0)
             hanging_joint = Physics::world.CreateJoint(&testJointDef);
     }
 }
