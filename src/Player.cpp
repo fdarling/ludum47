@@ -4,6 +4,7 @@
 //#include "MakeFixture.h" // TODO
 #include "globals.h"
 
+#include <box2d/b2_contact.h>
 #include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_prismatic_joint.h>
 
@@ -207,4 +208,50 @@ void Player::draw(const Point &offset) const
             SDL_RenderDrawRect(renderer, &dst2);
         }
     }*/
+}
+
+void Player::beginContact(b2Contact *contact, b2Fixture *other)
+{
+    b2WorldManifold contactWorldManifold;
+    contact->GetWorldManifold(&contactWorldManifold);
+
+    // determine if we are standing on the colliding object
+    if (contactWorldManifold.normal.y < 0.0 && contactWorldManifold.normal.y < -0.4)
+    {
+        player.standing_on.insert(other);
+        contact->SetFriction(0.95);
+    }
+    else
+    {
+        player.standing_on.erase(other);
+        contact->SetFriction(0.0);
+    }
+
+    if (contactWorldManifold.normal.y > 0.4)
+    {
+        // std::cout << "Hit Ceiling!" << std::endl;
+        b2Shape * const generic_shape = other->GetShape();
+        if (generic_shape->GetType() == b2Shape::e_edge)
+        {
+            b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
+
+            b2Vec2 dir = edge_shape->m_vertex2 - edge_shape->m_vertex1;
+            dir.Normalize();
+
+            if (std::abs(dir.y) < 0.01)
+                player.hanging_under.insert(edge_shape);
+        }
+    }
+}
+
+void Player::endContact(b2Contact *contact, b2Fixture *other)
+{
+    standing_on.erase(other);
+
+    b2Shape * const generic_shape = other->GetShape();
+    if (generic_shape->GetType() == b2Shape::e_edge)
+    {
+        b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
+        hanging_under.erase(edge_shape);
+    }
 }

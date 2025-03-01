@@ -24,6 +24,8 @@ public:
     void advance();
     void draw(const Point &offset) const;
     bool isStandingOnGround() const {return !standing_on.empty();}
+    void beginContact(b2Contact *contact, b2Fixture *other);
+    void endContact(b2Contact *contact, b2Fixture *other);
     Rect rect;
     // SDL_Texture *_standingTexture;
     SDL_Texture *_walkingTexture;
