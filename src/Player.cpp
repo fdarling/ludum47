@@ -78,7 +78,7 @@ void Player::shootBullet()
     static const float BULLET_Y_SPEED = -3.0;
     b2Vec2 bullet_vel(_walkingLeft ? -BULLET_X_SPEED : BULLET_X_SPEED, player_vel.y + BULLET_Y_SPEED);
 
-    Bullet * const bullet = new Bullet(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel);
+    /*Bullet * const bullet = */new Bullet(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel);
 }
 
 void Player::setJetpack(bool on)
@@ -133,7 +133,7 @@ void Player::advance()
     {
         const b2Vec2 &player_pos = body->GetPosition();
         const float player_width = (rect.w * Physics::METERS_PER_PIXEL);
-        const float player_height = (rect.h * Physics::METERS_PER_PIXEL);
+        // const float player_height = (rect.h * Physics::METERS_PER_PIXEL);
         b2EdgeShape * const edge_shape = *hanging_under.begin();
 
         // calculate the direction unit vector of the edge
@@ -246,6 +246,7 @@ void Player::beginContact(b2Contact *contact, b2Fixture *other)
 
 void Player::endContact(b2Contact *contact, b2Fixture *other)
 {
+    (void)contact;
     standing_on.erase(other);
 
     b2Shape * const generic_shape = other->GetShape();

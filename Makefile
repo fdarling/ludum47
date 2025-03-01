@@ -20,6 +20,7 @@ SOURCES = \
 	src/ContactListener.cpp \
 	src/DrawPhysics.cpp \
 	src/Player.cpp \
+	src/Bullet.cpp \
 	src/World.cpp \
 	src/Point.cpp \
 	src/Line.cpp \

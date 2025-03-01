@@ -8,6 +8,8 @@
 
 void ContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold)
 {
+    (void)oldManifold;
+
     // find the player body/fixture
     b2Fixture *playerFixture = contact->GetFixtureA();
     b2Fixture *otherFixture  = contact->GetFixtureB();
@@ -25,6 +27,8 @@ void ContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold
 
 void ContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse)
 {
+    (void)contact;
+    (void)impulse;
 }
 
 void ContactListener::BeginContact(b2Contact *contact)
