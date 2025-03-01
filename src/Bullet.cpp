@@ -26,3 +26,8 @@ Bullet::Bullet(const b2Vec2 &p, const b2Vec2 &v) : body(nullptr), fixture(nullpt
 
     body->SetLinearVelocity(v);
 }
+
+int Bullet::type() const
+{
+    return GAMEOBJECT_TYPE_BULLET;
+}

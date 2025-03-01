@@ -3,15 +3,17 @@
 #include <SDL2/SDL.h>
 #include <box2d/b2_body.h>
 
+#include "GameObject.h"
 #include "Point.h"
 #include "DrawPhysics.h"
 #include "ContactListener.h"
 
-class World
+class World : public GameObject
 {
 public:
     World();
     ~World();
+    int type() const;
     bool init();
     void quit();
     void draw(const Point &cameraPos);

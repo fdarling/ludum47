@@ -5,18 +5,22 @@
 #include <box2d/b2_edge_shape.h>
 #include <box2d/b2_joint.h>
 
+#include "GameObject.h"
 #include "Rect.h"
 
 #include <set>
 
-class Player
+class Player : public GameObject
 {
 public:
     Player();
     ~Player();
+    int type() const override;
     bool init();
     void walkLeft();
     void walkRight();
+    void climbUp();
+    void climbDown();
     void shootBullet();
     void setJetpack(bool on);
     void setGrappling(bool on);
@@ -24,6 +28,7 @@ public:
     void advance();
     void draw(const Point &offset) const;
     bool isStandingOnGround() const {return !standing_on.empty();}
+    bool isClimbing() const {return !climbing_up.empty();}
     void beginContact(b2Contact *contact, b2Fixture *other);
     void endContact(b2Contact *contact, b2Fixture *other);
     Rect rect;
@@ -38,5 +43,6 @@ public:
     b2Fixture *fixture;
     b2Joint *hanging_joint;
     std::set<b2Fixture*> standing_on;
+    std::set<b2Fixture*> climbing_up;
     std::set<b2EdgeShape*> hanging_under;
 };

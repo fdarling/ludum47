@@ -21,7 +21,9 @@ SOURCES = \
 	src/DrawPhysics.cpp \
 	src/Player.cpp \
 	src/Bullet.cpp \
+	src/Ladder.cpp \
 	src/World.cpp \
+	src/GameObject.cpp \
 	src/Point.cpp \
 	src/Line.cpp \
 	src/Camera.cpp \

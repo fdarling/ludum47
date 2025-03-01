@@ -46,20 +46,42 @@ static bool main_loop()
     }
     // process buttons being held
     {
+        bool walking_left_or_right = false;
         const Uint8 * const keys = SDL_GetKeyboardState(NULL);
              if ((keys[SDL_SCANCODE_D] && !keys[SDL_SCANCODE_A])
               || (keys[SDL_SCANCODE_RIGHT] && !keys[SDL_SCANCODE_LEFT]))
         {
             player.walkRight();
+            walking_left_or_right = true;
         }
         else if ((keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_D])
               || (keys[SDL_SCANCODE_LEFT] && !keys[SDL_SCANCODE_RIGHT]))
         {
             player.walkLeft();
+            walking_left_or_right = true;
         }
         if (keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_UP])
         {
-            player.jump();
+            if (player.isClimbing())
+                player.climbUp();
+            else
+                player.jump();
+        }
+        else if (keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_DOWN])
+        {
+            if (player.isClimbing())
+                player.climbDown();
+        }
+        else
+        {
+            if (player.isClimbing())
+            {
+                b2Vec2 vel = player.body->GetLinearVelocity();
+                vel.y = 0.0;
+                if (!walking_left_or_right)
+                    vel.x = 0.0;
+                player.body->SetLinearVelocity(vel);
+            }
         }
         player.setJetpack(keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT]);
         player.setGrappling(keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]);

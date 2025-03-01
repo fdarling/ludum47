@@ -1,4 +1,5 @@
 #include "World.h"
+#include "Ladder.h"
 #include "LoadTexture.h"
 #include "MakeFixture.h"
 #include "globals.h"
@@ -11,6 +12,7 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
     b2BodyDef groundBodyDef;
     // groundBodyDef.position.Set(0.0*Physics::METERS_PER_PIXEL, 0.0*Physics::METERS_PER_PIXEL);
     groundBody = Physics::world.CreateBody(&groundBodyDef);
+    groundBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 
     // add ground
     std::vector<b2Vec2> points;
@@ -20,7 +22,7 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
     points.emplace_back(800.0, 900.0);
     points.emplace_back(  0.0, 900.0);
     MakeFixture(groundBody, points);
-    
+
     // add small platform #1
     points.clear();
     points.emplace_back(0.0, 784.0);
@@ -52,7 +54,7 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
     points.emplace_back(192.0, 704.0);
     points.emplace_back(192.0, 720.0);
     MakeFixture(groundBody, points);
-    
+
     // add large platform #5
     points.clear();
     points.emplace_back(160.0, 720.0 - 64.0);
@@ -76,6 +78,9 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
     points.emplace_back(704.0, 800.0);
     MakeFixture(groundBody, points);
 
+    // add a ladder
+    new Ladder(b2Vec2(32+288.0, 576.0 - 64.0), b2Vec2(32+304.0, 784.0 - 92.0));
+
     // show graphical debugging
     uint32 flags = 0;
     flags |= b2Draw::e_shapeBit;
@@ -97,6 +102,11 @@ World::~World()
         SDL_DestroyTexture(_atlas);
     if (_bg)
         SDL_DestroyTexture(_bg);*/
+}
+
+int World::type() const
+{
+    return GAMEOBJECT_TYPE_WORLD;
 }
 
 bool World::init()

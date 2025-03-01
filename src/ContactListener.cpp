@@ -18,9 +18,12 @@ void ContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold
     if (playerFixture->GetBody() != player.body)
         return;
 
-    if (otherFixture->GetBody() != world.groundBody)
+    GameObject * const obj = reinterpret_cast<GameObject*>(otherFixture->GetBody()->GetUserData().pointer);
+    if (!obj)
+        return;
+
+    if (obj->type() == GAMEOBJECT_TYPE_BULLET)
     {
-        // it must be a bullet!
         contact->SetEnabled(false); // make it so the bullets cannot collide with the player
     }
 }
@@ -41,11 +44,7 @@ void ContactListener::BeginContact(b2Contact *contact)
     if (playerFixture->GetBody() != player.body)
         return;
 
-    // see if the other body/fixture is the ground
-    if (otherFixture->GetBody() == world.groundBody)
-    {
-        player.beginContact(contact, otherFixture);
-    }
+    player.beginContact(contact, otherFixture);
 }
 
 void ContactListener::EndContact(b2Contact *contact)
@@ -58,9 +57,5 @@ void ContactListener::EndContact(b2Contact *contact)
     if (playerFixture->GetBody() != player.body)
         return;
 
-    // see if the other body/fixture is the ground
-    if (otherFixture->GetBody() == world.groundBody)
-    {
-        player.endContact(contact, otherFixture);
-    }
+    player.endContact(contact, otherFixture);
 }

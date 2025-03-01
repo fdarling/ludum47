@@ -17,8 +17,10 @@ add_executable(${PROJECT_NAME}
     src/LoadTexture.cpp
     src/ContactListener.cpp
     src/DrawPhysics.cpp
+    src/GameObject.cpp
     src/Player.cpp
     src/Bullet.cpp
+    src/Ladder.cpp
     src/World.cpp
     src/Point.cpp
     src/Line.cpp

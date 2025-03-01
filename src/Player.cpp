@@ -36,6 +36,11 @@ Player::~Player()
         SDL_DestroyTexture(_walkingTexture);
 }
 
+int Player::type() const
+{
+    return GAMEOBJECT_TYPE_PLAYER;
+}
+
 bool Player::init()
 {
     // _standingTexture = LoadTexture("assets/standing.png");
@@ -67,6 +72,24 @@ void Player::walkRight()
         body->SetLinearVelocity(vel);
     }
     _walkingLeft = false;
+}
+
+void Player::climbUp()
+{
+    if (!isClimbing())
+        return;
+    b2Vec2 vel = player.body->GetLinearVelocity();
+    vel.y = -3.0;
+    body->SetLinearVelocity(vel);
+}
+
+void Player::climbDown()
+{
+    if (!isClimbing())
+        return;
+    b2Vec2 vel = player.body->GetLinearVelocity();
+    vel.y = 3.0;
+    body->SetLinearVelocity(vel);
 }
 
 void Player::shootBullet()
@@ -114,7 +137,12 @@ void Player::advance()
             _frameIndex = 0;
     }
 
-    if (_jetpackOn)
+    if (isClimbing())
+    {
+        const float mass = body->GetMass();
+        body->ApplyForceToCenter(b2Vec2(0.0, -9.8f * mass), false);
+    }
+    else if (_jetpackOn)
     {
         const b2Vec2 vel = body->GetLinearVelocity();
         const float mass = body->GetMass();
@@ -212,47 +240,70 @@ void Player::draw(const Point &offset) const
 
 void Player::beginContact(b2Contact *contact, b2Fixture *other)
 {
+    GameObject * const obj = reinterpret_cast<GameObject*>(other->GetBody()->GetUserData().pointer);
+    if (!obj)
+        return;
+
     b2WorldManifold contactWorldManifold;
     contact->GetWorldManifold(&contactWorldManifold);
 
-    // determine if we are standing on the colliding object
-    if (contactWorldManifold.normal.y < 0.0 && contactWorldManifold.normal.y < -0.4)
+    if (obj->type() == GAMEOBJECT_TYPE_WORLD)
     {
-        player.standing_on.insert(other);
-        contact->SetFriction(0.95);
-    }
-    else
-    {
-        player.standing_on.erase(other);
-        contact->SetFriction(0.0);
-    }
-
-    if (contactWorldManifold.normal.y > 0.4)
-    {
-        // std::cout << "Hit Ceiling!" << std::endl;
-        b2Shape * const generic_shape = other->GetShape();
-        if (generic_shape->GetType() == b2Shape::e_edge)
+        // determine if we are standing on the colliding object
+        if (contactWorldManifold.normal.y < 0.0 && contactWorldManifold.normal.y < -0.4)
         {
-            b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
-
-            b2Vec2 dir = edge_shape->m_vertex2 - edge_shape->m_vertex1;
-            dir.Normalize();
-
-            if (std::abs(dir.y) < 0.01)
-                player.hanging_under.insert(edge_shape);
+            player.standing_on.insert(other);
+            contact->SetFriction(0.95);
         }
+        else
+        {
+            player.standing_on.erase(other);
+            contact->SetFriction(0.0);
+        }
+
+        if (contactWorldManifold.normal.y > 0.4)
+        {
+            // std::cout << "Hit Ceiling!" << std::endl;
+            b2Shape * const generic_shape = other->GetShape();
+            if (generic_shape->GetType() == b2Shape::e_edge)
+            {
+                b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
+
+                b2Vec2 dir = edge_shape->m_vertex2 - edge_shape->m_vertex1;
+                dir.Normalize();
+
+                if (std::abs(dir.y) < 0.01)
+                    player.hanging_under.insert(edge_shape);
+            }
+        }
+    }
+    else if (obj->type() == GAMEOBJECT_TYPE_LADDER)
+    {
+        climbing_up.insert(other);
     }
 }
 
 void Player::endContact(b2Contact *contact, b2Fixture *other)
 {
     (void)contact;
-    standing_on.erase(other);
 
-    b2Shape * const generic_shape = other->GetShape();
-    if (generic_shape->GetType() == b2Shape::e_edge)
+    GameObject * const obj = reinterpret_cast<GameObject*>(other->GetBody()->GetUserData().pointer);
+    if (!obj)
+        return;
+
+    if (obj->type() == GAMEOBJECT_TYPE_WORLD)
     {
-        b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
-        hanging_under.erase(edge_shape);
+        standing_on.erase(other);
+
+        b2Shape * const generic_shape = other->GetShape();
+        if (generic_shape->GetType() == b2Shape::e_edge)
+        {
+            b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
+            hanging_under.erase(edge_shape);
+        }
+    }
+    else if (obj->type() == GAMEOBJECT_TYPE_LADDER)
+    {
+        climbing_up.erase(other);
     }
 }

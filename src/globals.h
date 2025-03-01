@@ -35,3 +35,12 @@ extern SDL_Renderer *renderer;
 extern World world;
 extern Player player;
 extern Camera camera;
+
+enum GameObjectType
+{
+    GAMEOBJECT_TYPE_NONE,
+    GAMEOBJECT_TYPE_PLAYER,
+    GAMEOBJECT_TYPE_BULLET,
+    GAMEOBJECT_TYPE_LADDER,
+    GAMEOBJECT_TYPE_WORLD
+};
