@@ -80,11 +80,12 @@ make # if using the classic "make" build system
 
 ## Playing
 
-The controls use WASD:
+The keyboard controls:
 * <kbd>A</kbd> or <kbd>&#8592;</kbd> for left
 * <kbd>D</kbd> or <kbd>&#8594;</kbd> for right
 * <kbd>W</kbd> or <kbd>&#8593;</kbd> for jump
 * <kbd>S</kbd> or <kbd>&#8595;</kbd> for crouch/climb down (currently not implemented)
+* <kbd>SPACE</kbd> shoot bullet (experimental)
 * <kbd>SHIFT</kbd> jetpack thruster (experimental)
 * <kbd>CTRL</kbd> enable grappling the ceiling (experimental)
 * <kbd>ESC</kbd> will exit the game.

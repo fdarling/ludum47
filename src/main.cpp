@@ -27,6 +27,11 @@ static bool main_loop()
         {
             switch (event.key.keysym.sym)
             {
+                case SDLK_SPACE:
+                {
+                    player.shootBullet();
+                }
+                break;
                 // case SDLK_LEFT:
                 // camera.pos.x -= 1;
                 // break;

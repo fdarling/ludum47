@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Bullet.h"
 #include "LoadTexture.h"
 //#include "MakeFixture.h" // TODO
 #include "globals.h"
@@ -65,6 +66,18 @@ void Player::walkRight()
         body->SetLinearVelocity(vel);
     }
     _walkingLeft = false;
+}
+
+void Player::shootBullet()
+{
+    const b2Vec2 player_pos = body->GetPosition();
+    const b2Vec2 player_vel = body->GetLinearVelocity();
+
+    static const float BULLET_X_SPEED = 20.0;
+    static const float BULLET_Y_SPEED = -3.0;
+    b2Vec2 bullet_vel(_walkingLeft ? -BULLET_X_SPEED : BULLET_X_SPEED, player_vel.y + BULLET_Y_SPEED);
+
+    Bullet * const bullet = new Bullet(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel);
 }
 
 void Player::setJetpack(bool on)

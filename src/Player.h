@@ -17,6 +17,7 @@ public:
     bool init();
     void walkLeft();
     void walkRight();
+    void shootBullet();
     void setJetpack(bool on);
     void setGrappling(bool on);
     void jump();
