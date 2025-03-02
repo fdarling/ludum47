@@ -28,15 +28,15 @@ SOURCES = \
 	src/Line.cpp \
 	src/Camera.cpp \
 	src/main.cpp
-BUILDIR = make_build
-OBJECTS += $(addprefix $(BUILDIR)/,$(addsuffix .o,$(basename $(SOURCES))))
+BUILD_DIR = make_build
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(addsuffix .o,$(basename $(SOURCES))))
 
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	$(CXX) -o $(TARGET) $(OBJECTS) $(LIBS)
 
-$(BUILDIR)/%.o: %.cpp
+$(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) -o $@ -c $< $(CFLAGS)
 
@@ -44,6 +44,6 @@ $(BUILDIR)/%.o: %.cpp
 
 clean:
 	rm -f $(OBJECTS) $(OBJECTS:.o=.d) $(TARGET_RAW) $(TARGET_RAW).exe $(TARGET_RAW).html $(TARGET_RAW).wasm $(TARGET_RAW).js $(TARGET_RAW).data
-	rm -rf build
+	rm -rf ${BUILD_DIR}
 
 .PHONY: all clean
