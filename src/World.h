@@ -1,7 +1,8 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include <box2d/b2_body.h>
+
+class b2Body; // forward declaration instead of #include <box2d/b2_body.h>
 
 #include "GameObject.h"
 #include "Point.h"

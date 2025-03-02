@@ -1,9 +1,10 @@
 #pragma once
 
-#include <box2d/b2_body.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_edge_shape.h>
-#include <box2d/b2_joint.h>
+class b2Body; // forward declaration instead of #include <box2d/b2_body.h>
+class b2Fixture; // forward declaration instead of #include <box2d/b2_fixture.h>
+class b2EdgeShape; // forward declaration instead of #include <box2d/b2_edge_shape.h>
+class b2Joint; // forward declaration instead of #include <box2d/b2_joint.h>
+class b2Contact; // forward declaration instead of #include <box2d/b2_contact.h>
 
 #include "GameObject.h"
 #include "Rect.h"

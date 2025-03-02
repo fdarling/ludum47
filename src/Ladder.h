@@ -2,8 +2,9 @@
 
 #include "GameObject.h"
 
-#include <box2d/b2_body.h>
-#include <box2d/b2_fixture.h>
+class b2Vec2; // forward declaration instead of #include <box2d/b2_math.h>
+class b2Body; // forward declaration instead of #include <box2d/b2_body.h>
+class b2Fixture; // forward declaration instead of #include <box2d/b2_fixture.h>
 
 class Ladder : public GameObject
 {

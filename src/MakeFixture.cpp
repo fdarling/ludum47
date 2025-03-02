@@ -3,6 +3,7 @@
 
 // #define USE_POLYGON_INSTEAD_OF_EDGES
 
+#include <box2d/b2_body.h>
 #ifdef USE_POLYGON_INSTEAD_OF_EDGES
 #include <box2d/b2_polygon_shape.h>
 #else // USE_POLYGON_INSTEAD_OF_EDGES

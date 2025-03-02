@@ -1,8 +1,11 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif  // __EMSCRIPTEN__
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+
+#include <box2d/b2_body.h>
 
 #include <cstdio>
 #include <cstring>

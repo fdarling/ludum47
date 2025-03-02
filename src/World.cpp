@@ -6,6 +6,8 @@
 
 #include <SDL2/SDL.h>
 
+#include <box2d/b2_body.h>
+
 World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_GetTicks())
 {
     // make body

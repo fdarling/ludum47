@@ -5,6 +5,7 @@
 #include "globals.h"
 
 #include <box2d/b2_contact.h>
+#include <box2d/b2_edge_shape.h>
 #include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_prismatic_joint.h>
 
