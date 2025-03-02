@@ -4,6 +4,7 @@
 #include <box2d/b2_body.h>
 #include <box2d/b2_fixture.h>
 #include <box2d/b2_circle_shape.h>
+#include <box2d/b2_contact.h>
 
 Bullet::Bullet(const b2Vec2 &p, const b2Vec2 &v) : body(nullptr), fixture(nullptr)
 {
@@ -30,4 +31,16 @@ Bullet::Bullet(const b2Vec2 &p, const b2Vec2 &v) : body(nullptr), fixture(nullpt
 int Bullet::type() const
 {
     return GAMEOBJECT_TYPE_BULLET;
+}
+
+void Bullet::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *other)
+{
+    GameObject * const obj = reinterpret_cast<GameObject*>(other->GetBody()->GetUserData().pointer);
+    if (!obj)
+        return;
+
+    if (obj->type() == GAMEOBJECT_TYPE_BULLET)
+    {
+        contact->SetEnabled(false); // make it so the bullets cannot collide with the player
+    }
 }

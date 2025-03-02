@@ -11,6 +11,7 @@ class Bullet : public GameObject
 public:
     Bullet(const b2Vec2 &p, const b2Vec2 &v);
     int type() const override;
+    void preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *other) override;
 public:
     b2Body *body;
     b2Fixture *fixture;

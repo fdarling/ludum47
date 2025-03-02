@@ -8,54 +8,56 @@
 
 void ContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold)
 {
-    (void)oldManifold;
-
-    // find the player body/fixture
-    b2Fixture *playerFixture = contact->GetFixtureA();
-    b2Fixture *otherFixture  = contact->GetFixtureB();
-    if (otherFixture->GetBody() == player.body)
-        std::swap(playerFixture, otherFixture);
-    if (playerFixture->GetBody() != player.body)
-        return;
-
-    GameObject * const obj = reinterpret_cast<GameObject*>(otherFixture->GetBody()->GetUserData().pointer);
-    if (!obj)
-        return;
-
-    if (obj->type() == GAMEOBJECT_TYPE_BULLET)
-    {
-        contact->SetEnabled(false); // make it so the bullets cannot collide with the player
-    }
+    b2Fixture * const fixtureA = contact->GetFixtureA();
+    b2Fixture * const fixtureB = contact->GetFixtureB();
+    b2Body * const bodyA = fixtureA->GetBody();
+    b2Body * const bodyB = fixtureB->GetBody();
+    GameObject * const objA = reinterpret_cast<GameObject*>(bodyA->GetUserData().pointer);
+    GameObject * const objB = reinterpret_cast<GameObject*>(bodyB->GetUserData().pointer);
+    if (objA)
+        objA->preSolve(contact, oldManifold, fixtureB);
+    if (objB)
+        objB->preSolve(contact, oldManifold, fixtureA);
 }
 
 void ContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse)
 {
-    (void)contact;
-    (void)impulse;
+    b2Fixture * const fixtureA = contact->GetFixtureA();
+    b2Fixture * const fixtureB = contact->GetFixtureB();
+    b2Body * const bodyA = fixtureA->GetBody();
+    b2Body * const bodyB = fixtureB->GetBody();
+    GameObject * const objA = reinterpret_cast<GameObject*>(bodyA->GetUserData().pointer);
+    GameObject * const objB = reinterpret_cast<GameObject*>(bodyB->GetUserData().pointer);
+    if (objA)
+        objA->postSolve(contact, impulse, fixtureB);
+    if (objB)
+        objB->postSolve(contact, impulse, fixtureA);
 }
 
 void ContactListener::BeginContact(b2Contact *contact)
 {
-    // find the player body/fixture
-    b2Fixture *playerFixture = contact->GetFixtureA();
-    b2Fixture *otherFixture  = contact->GetFixtureB();
-    if (otherFixture->GetBody() == player.body)
-        std::swap(playerFixture, otherFixture);
-    if (playerFixture->GetBody() != player.body)
-        return;
-
-    player.beginContact(contact, otherFixture);
+    b2Fixture * const fixtureA = contact->GetFixtureA();
+    b2Fixture * const fixtureB = contact->GetFixtureB();
+    b2Body * const bodyA = fixtureA->GetBody();
+    b2Body * const bodyB = fixtureB->GetBody();
+    GameObject * const objA = reinterpret_cast<GameObject*>(bodyA->GetUserData().pointer);
+    GameObject * const objB = reinterpret_cast<GameObject*>(bodyB->GetUserData().pointer);
+    if (objA)
+        objA->beginContact(contact, fixtureB);
+    if (objB)
+        objB->beginContact(contact, fixtureA);
 }
 
 void ContactListener::EndContact(b2Contact *contact)
 {
-    // find the player body/fixture
-    b2Fixture *playerFixture = contact->GetFixtureA();
-    b2Fixture *otherFixture  = contact->GetFixtureB();
-    if (otherFixture->GetBody() == player.body)
-        std::swap(playerFixture, otherFixture);
-    if (playerFixture->GetBody() != player.body)
-        return;
-
-    player.endContact(contact, otherFixture);
+    b2Fixture * const fixtureA = contact->GetFixtureA();
+    b2Fixture * const fixtureB = contact->GetFixtureB();
+    b2Body * const bodyA = fixtureA->GetBody();
+    b2Body * const bodyB = fixtureB->GetBody();
+    GameObject * const objA = reinterpret_cast<GameObject*>(bodyA->GetUserData().pointer);
+    GameObject * const objB = reinterpret_cast<GameObject*>(bodyB->GetUserData().pointer);
+    if (objA)
+        objA->endContact(contact, fixtureB);
+    if (objB)
+        objB->endContact(contact, fixtureA);
 }

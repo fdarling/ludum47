@@ -4,7 +4,6 @@ class b2Body; // forward declaration instead of #include <box2d/b2_body.h>
 class b2Fixture; // forward declaration instead of #include <box2d/b2_fixture.h>
 class b2EdgeShape; // forward declaration instead of #include <box2d/b2_edge_shape.h>
 class b2Joint; // forward declaration instead of #include <box2d/b2_joint.h>
-class b2Contact; // forward declaration instead of #include <box2d/b2_contact.h>
 
 #include "GameObject.h"
 #include "Rect.h"
@@ -30,8 +29,8 @@ public:
     void draw(const Point &offset) const;
     bool isStandingOnGround() const {return !standing_on.empty();}
     bool isClimbing() const {return !climbing_up.empty();}
-    void beginContact(b2Contact *contact, b2Fixture *other);
-    void endContact(b2Contact *contact, b2Fixture *other);
+    void beginContact(b2Contact *contact, b2Fixture *other) override;
+    void endContact(b2Contact *contact, b2Fixture *other) override;
     Rect rect;
     // SDL_Texture *_standingTexture;
     SDL_Texture *_walkingTexture;
