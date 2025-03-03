@@ -34,7 +34,7 @@ int Spring::type() const
 {
     return GAMEOBJECT_TYPE_SPRING;
 }
-#include <iostream>
+
 void Spring::beginContact(b2Contact *contact, b2Fixture *other)
 {
     (void)contact;

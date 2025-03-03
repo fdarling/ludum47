@@ -275,7 +275,7 @@ void Player::beginContact(b2Contact *contact, b2Fixture *other)
     b2WorldManifold contactWorldManifold;
     contact->GetWorldManifold(&contactWorldManifold);
 
-    if (obj->type() == GAMEOBJECT_TYPE_WORLD)
+    if (obj->type() == GAMEOBJECT_TYPE_WORLD || obj->type() == GAMEOBJECT_TYPE_SPEEDBOOSTER)
     {
         // determine if we are standing on the colliding object
         if (contactWorldManifold.normal.y < 0.0 && contactWorldManifold.normal.y < -0.4)
