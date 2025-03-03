@@ -21,7 +21,7 @@ public:
     void advance();
     b2Body *groundBody;
 protected:
-    // SDL_Texture *_atlas;
+    SDL_Texture *_atlas;
     // SDL_Texture *_bg;
     Uint32 _lastTime;
     DrawPhysics _debugDraw;

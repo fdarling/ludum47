@@ -120,6 +120,9 @@ int World::type() const
 
 bool World::init()
 {
+    // I'm not sure if you are intentionally avoiding it, but check out IMG_LoadTexture() from SDL2_image:
+    // IMG_LoadTexture(renderer, "assets/tiles.png");
+    _atlas = LoadTexture("assets/tiles.png");
     /*_atlas = LoadTexture("assets/stairs.png");
     _bg = LoadTexture("assets/background_smaller.png");
     return _atlas && _bg;*/
@@ -156,6 +159,20 @@ void World::draw(const Point &offset)
         const int x_offset = offset.x%TILE_WIDTH;
         SDL_RenderDrawLine(renderer, x-x_offset, 0, x-x_offset, SCREEN_HEIGHT-1);
     }
+    static const int tile_size = 12;
+    SDL_Rect src = {6 * tile_size, tile_size, tile_size, tile_size};
+    SDL_Rect dst = {0, 0, tile_size, tile_size};
+    for (int row = 0; row < (SCREEN_HEIGHT / tile_size) + 3; row++)
+    {
+        // dst.y = (row * tile_size) - offset.y;
+        dst.y = ((row - 1) * tile_size) - (offset.y % tile_size);
+        for (int col = 0; col < (SCREEN_WIDTH / tile_size) + 3; col++)
+        {
+            // dst.x = (col * tile_size) - offset.x;
+            dst.x = ((col - 1) * tile_size) - (offset.x % tile_size);
+            SDL_RenderCopy(renderer, _atlas, &src, &dst);
+        }
+    }
     /*static const int LAST_ROW = SCREEN_HEIGHT/TILE_HEIGHT;
     static const int LAST_COL = SCREEN_WIDTH/TILE_WIDTH;
     for (int row = 0; row < LAST_ROW; row++)
@@ -184,3 +201,22 @@ void World::draw(const Point &offset)
     for (std::size_t i = 0; i < sizeof(rects)/sizeof(rects[0]); i++)
         SDL_RenderCopy(renderer, _bg, NULL, rects + i);*/
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
