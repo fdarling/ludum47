@@ -1,5 +1,6 @@
 #include "World.h"
 #include "Ladder.h"
+#include "Spring.h"
 #include "LoadTexture.h"
 #include "MakeFixture.h"
 #include "globals.h"
@@ -82,6 +83,9 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
 
     // add a ladder
     new Ladder(b2Vec2(32+288.0, 576.0 - 64.0), b2Vec2(32+304.0, 784.0 - 92.0));
+
+    // add a spring
+    new Spring(b2Vec2(192.0, 800.0), b2Vec2(224.0, 792.0));
 
     // show graphical debugging
     uint32 flags = 0;

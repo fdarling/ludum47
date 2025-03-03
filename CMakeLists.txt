@@ -11,6 +11,9 @@ find_package(box2d REQUIRED)
 include(FindPkgConfig)
 pkg_search_module(SDL2_gfx REQUIRED SDL2_gfx)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+
 add_executable(${PROJECT_NAME}
     src/globals.cpp
     src/MakeFixture.cpp
@@ -20,6 +23,7 @@ add_executable(${PROJECT_NAME}
     src/GameObject.cpp
     src/Player.cpp
     src/Bullet.cpp
+    src/Spring.cpp
     src/Ladder.cpp
     src/World.cpp
     src/Point.cpp
