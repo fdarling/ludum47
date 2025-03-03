@@ -141,16 +141,21 @@ void Player::advance()
     if (isClimbing())
     {
         const float mass = body->GetMass();
-        body->ApplyForceToCenter(b2Vec2(0.0, -9.8f * mass), false);
+        b2Vec2 antigravity_force = Physics::world.GetGravity();
+        antigravity_force *= -mass;
+        body->ApplyForceToCenter(antigravity_force, false);
     }
     else if (_jetpackOn)
     {
         const b2Vec2 vel = body->GetLinearVelocity();
         const float mass = body->GetMass();
+        b2Vec2 antigravity_force = Physics::world.GetGravity();
+        antigravity_force *= -mass;
         static const float MAX_JETPACK_FORCE = 20.0; // not including the gravity counteracting force
         static const float MAX_JETPACK_SPEED = 5;
-        float extra = std::max(0.0, MAX_JETPACK_FORCE*(1.0 + vel.y/MAX_JETPACK_SPEED));
-        body->ApplyForceToCenter(b2Vec2(0.0, (-9.8f - extra) * mass), true);
+        const float jetpack_accel = -std::max(0.0, MAX_JETPACK_FORCE*(1.0 + vel.y/MAX_JETPACK_SPEED));
+        const b2Vec2 jetpack_force(0.0, jetpack_accel * mass);
+        body->ApplyForceToCenter(antigravity_force + jetpack_force, true);
     }
 
     if (!_grappling && hanging_joint)
