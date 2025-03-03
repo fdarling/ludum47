@@ -39,7 +39,7 @@ void Bullet::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixtu
     if (!obj)
         return;
 
-    if (obj->type() == GAMEOBJECT_TYPE_BULLET)
+    if (obj->type() == GAMEOBJECT_TYPE_PLAYER)
     {
         contact->SetEnabled(false); // make it so the bullets cannot collide with the player
     }
