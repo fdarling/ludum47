@@ -98,9 +98,31 @@ void Player::shootBullet()
     const b2Vec2 player_pos = body->GetPosition();
     const b2Vec2 player_vel = body->GetLinearVelocity();
 
-    static const float BULLET_X_SPEED = 20.0;
-    static const float BULLET_Y_SPEED = -3.0;
-    b2Vec2 bullet_vel(_walkingLeft ? -BULLET_X_SPEED : BULLET_X_SPEED, player_vel.y + BULLET_Y_SPEED);
+    // static const float BULLET_X_SPEED = 20.0;
+    // static const float BULLET_Y_SPEED = -3.0;
+    // b2Vec2 bullet_vel(_walkingLeft ? -BULLET_X_SPEED : BULLET_X_SPEED, player_vel.y + BULLET_Y_SPEED);
+
+    int x, y, w, h;
+    SDL_GetMouseState(&x, &y);
+    SDL_GetWindowSize(window, &w, &h);
+    float delta_x = x - (w / 2);
+    float delta_y = y - (h / 2);
+    
+    static const float BULLET_MAX_SPEED = 15.0;
+    float BULLET_Y_SPEED, BULLET_X_SPEED;
+    if (delta_y == 0)
+    {
+        BULLET_Y_SPEED = 0;
+        BULLET_X_SPEED = std::copysign(BULLET_MAX_SPEED, delta_x);
+    }
+    else 
+    {
+        // There is likely a way to better optimize this:
+        float ratio = std::abs(delta_x / delta_y);
+        BULLET_Y_SPEED = std::copysign(BULLET_MAX_SPEED / (1 + ratio), delta_y);
+        BULLET_X_SPEED = std::copysign(BULLET_Y_SPEED * ratio, delta_x);
+    }
+    b2Vec2 bullet_vel(BULLET_X_SPEED, player_vel.y + BULLET_Y_SPEED);
 
     /*Bullet * const bullet = */new Bullet(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel);
 }
