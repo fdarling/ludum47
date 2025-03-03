@@ -25,7 +25,7 @@ Spring::Spring(const b2Vec2 &p1, const b2Vec2 &p2) : body(nullptr), fixture(null
     fixtureDef.shape = &boxShape;
     fixtureDef.density = 1.0;
     fixtureDef.friction = 0.0;
-    fixtureDef.isSensor = true;
+    // fixtureDef.isSensor = true;
 
     fixture = body->CreateFixture(&fixtureDef);
 }
@@ -44,7 +44,22 @@ void Spring::beginContact(b2Contact *contact, b2Fixture *other)
         return;
 
     // if (obj->type() == GAMEOBJECT_TYPE_PLAYER)
+
+    b2WorldManifold contactWorldManifold;
+    contact->GetWorldManifold(&contactWorldManifold);
+
+    if (contactWorldManifold.normal.y <= -0.4)
     {
-        other->GetBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0, -5.0), true);
+        // bounce method (you bounce higher each time though)
+        // contact->SetRestitution(1.5); // bounce factor
+
+        // finite energy addition method
+        //// contact->SetRestitution(0.0); // TODO: dead-stop first for impulse consistency?
+        // other->GetBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0, -5.0), true); // TODO should be considering mass of target?
+
+        // constant initial speed method
+        b2Vec2 v = other->GetBody()->GetLinearVelocity();
+        v.y = -7.0;
+        other->GetBody()->SetLinearVelocity(v);
     }
 }
