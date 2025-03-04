@@ -45,10 +45,10 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
 
     // add small platform #3
     points.clear();
-    points.emplace_back(128.0, 752.0);
-    points.emplace_back(128.0, 736.0);
-    points.emplace_back(160.0, 736.0);
-    points.emplace_back(160.0, 752.0);
+    points.emplace_back(120.0, 756.0);
+    points.emplace_back(120.0, 744.0);
+    points.emplace_back(144.0, 744.0);
+    points.emplace_back(144.0, 756.0);
     MakeFixture(groundBody, points);
 
     // add small platform #4
@@ -86,7 +86,7 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
     new Ladder(b2Vec2(32+288.0, 576.0 - 64.0), b2Vec2(32+304.0, 784.0 - 92.0));
 
     // add a spring
-    new Spring(b2Vec2(192.0, 800.0), b2Vec2(224.0, 792.0));
+    new Spring(b2Vec2(192.0, 800.0), b2Vec2(192.0 + 24, 800.0 - 12));
 
     new SpeedBooster(b2Vec2(192.0 - 256.0*3, 800.0), b2Vec2(224.0 - 256.0, 792.0));
 
@@ -173,6 +173,23 @@ void World::draw(const Point &offset)
             SDL_RenderCopy(renderer, _atlas, &src, &dst);
         }
     }
+    
+    // Temporary test render:
+    dst.x = 192 - offset.x;
+    dst.y = 788 - offset.y;
+    src.x = 14 * tile_size;
+    src.y = 15 * tile_size;
+    SDL_RenderCopy(renderer, _atlas, &src, &dst);
+    dst.x = 192 - offset.x + tile_size;
+    SDL_RenderCopy(renderer, _atlas, &src, &dst);
+    src.x = 0;
+    src.y = 1 * tile_size;
+    dst.x = 120 - offset.x;
+    dst.y = 744 - offset.y;
+    SDL_RenderCopy(renderer, _atlas, &src, &dst);
+    dst.x = 120 - offset.x + tile_size;
+    SDL_RenderCopy(renderer, _atlas, &src, &dst);
+
     /*static const int LAST_ROW = SCREEN_HEIGHT/TILE_HEIGHT;
     static const int LAST_COL = SCREEN_WIDTH/TILE_WIDTH;
     for (int row = 0; row < LAST_ROW; row++)
