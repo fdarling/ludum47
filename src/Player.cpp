@@ -9,6 +9,9 @@
 #include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_prismatic_joint.h>
 
+static const float MAX_WALK_FORCE = 150.0;
+static const float MAX_WALK_SPEED = 3.0;
+
 Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _jetpackOn(false), _grappling(false), _lastPos(rect.topLeft()), body(nullptr), fixture(nullptr), hanging_joint(nullptr)
 {
     b2BodyDef bodyDef;
@@ -52,12 +55,18 @@ bool Player::init()
 void Player::walkLeft()
 {
     b2Vec2 vel = player.body->GetLinearVelocity();
-    vel.x = -3.0;
     // if (!standing_on.empty())
     // if (!standing_on.empty() || blocked_left_by.empty())
     {
         // std::cout << "SETTING LEFT VEL" << std::endl;
-        body->SetLinearVelocity(vel);
+        // vel.x = -3.0;
+        // body->SetLinearVelocity(vel);
+
+        const float mass = body->GetMass();
+        const float walk_accel = -MAX_WALK_FORCE*std::max(0.0, std::min(1.0, 1.0 + vel.x/MAX_WALK_SPEED));
+        const b2Vec2 walk_force(walk_accel * mass, 0.0);
+        body->ApplyForceToCenter(walk_force, true);
+
     }
     _walkingLeft = true;
 }
@@ -65,12 +74,17 @@ void Player::walkLeft()
 void Player::walkRight()
 {
     b2Vec2 vel = player.body->GetLinearVelocity();
-    vel.x = 3.0;
     // if (!standing_on.empty())
     // if (!standing_on.empty() || blocked_right_by.empty())
     {
         // std::cout << "SETTING RIGHT VEL" << std::endl;
-        body->SetLinearVelocity(vel);
+        // vel.x = 3.0;
+        // body->SetLinearVelocity(vel);
+
+        const float mass = body->GetMass();
+        const float walk_accel = MAX_WALK_FORCE*std::max(0.0, std::min(1.0, 1.0 - vel.x/MAX_WALK_SPEED));
+        const b2Vec2 walk_force(walk_accel * mass, 0.0);
+        body->ApplyForceToCenter(walk_force, true);
     }
     _walkingLeft = false;
 }
@@ -107,7 +121,7 @@ void Player::shootBullet()
     SDL_GetWindowSize(window, &w, &h);
     float delta_x = x - (w / 2);
     float delta_y = y - (h / 2);
-    
+
     static const float BULLET_MAX_SPEED = 15.0;
     float BULLET_Y_SPEED, BULLET_X_SPEED;
     if (delta_y == 0)
@@ -115,7 +129,7 @@ void Player::shootBullet()
         BULLET_Y_SPEED = 0;
         BULLET_X_SPEED = std::copysign(BULLET_MAX_SPEED, delta_x);
     }
-    else 
+    else
     {
         // There is likely a way to better optimize this:
         float ratio = std::abs(delta_x / delta_y);
@@ -319,7 +333,7 @@ void Player::endContact(b2Contact *contact, b2Fixture *other)
     if (!obj)
         return;
 
-    if (obj->type() == GAMEOBJECT_TYPE_WORLD)
+    if (obj->type() == GAMEOBJECT_TYPE_WORLD || obj->type() == GAMEOBJECT_TYPE_SPEEDBOOSTER)
     {
         standing_on.erase(other);
 
