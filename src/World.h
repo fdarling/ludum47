@@ -9,6 +9,8 @@ class b2Body; // forward declaration instead of #include <box2d/b2_body.h>
 #include "DrawPhysics.h"
 #include "ContactListener.h"
 
+#include <vector>
+
 class World : public GameObject
 {
 public:
@@ -26,4 +28,5 @@ protected:
     Uint32 _lastTime;
     DrawPhysics _debugDraw;
     ContactListener _contactListener;
+    std::vector<GameObject*> _children;
 };

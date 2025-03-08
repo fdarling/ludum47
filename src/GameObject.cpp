@@ -4,6 +4,10 @@ GameObject::GameObject() = default;
 
 GameObject::~GameObject() = default;
 
+void GameObject::advance(float ms)
+{
+}
+
 void GameObject::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *other)
 {
     (void)contact;

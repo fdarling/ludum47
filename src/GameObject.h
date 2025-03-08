@@ -11,6 +11,7 @@ public:
     GameObject();
     virtual ~GameObject();
     virtual int type() const = 0;
+    virtual void advance(float ms);
     virtual void preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *other);
     virtual void postSolve(b2Contact *contact, const b2ContactImpulse *impulse, b2Fixture *other);
     virtual void beginContact(b2Contact *contact, b2Fixture *other);

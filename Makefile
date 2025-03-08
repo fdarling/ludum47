@@ -24,6 +24,7 @@ SOURCES = \
 	src/SpeedBooster.cpp \
 	src/Spring.cpp \
 	src/Ladder.cpp \
+	src/MovingPlatform.cpp \
 	src/World.cpp \
 	src/GameObject.cpp \
 	src/Point.cpp \

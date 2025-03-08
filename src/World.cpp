@@ -1,4 +1,5 @@
 #include "World.h"
+#include "MovingPlatform.h"
 #include "Ladder.h"
 #include "Spring.h"
 #include "SpeedBooster.h"
@@ -83,12 +84,14 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
     MakeFixture(groundBody, points);
 
     // add a ladder
-    new Ladder(b2Vec2(32+288.0, 576.0 - 64.0), b2Vec2(32+304.0, 784.0 - 92.0));
+    _children.push_back(new Ladder(b2Vec2(32+288.0, 576.0 - 64.0), b2Vec2(32+304.0, 784.0 - 92.0)));
+
+    _children.push_back(new MovingPlatform(b2Vec2(320.0 - 128.0, 512.0 - 96.0), b2Vec2(336.0 - 64.0, 692.0 - 96.0)));
 
     // add a spring
-    new Spring(b2Vec2(192.0, 800.0), b2Vec2(192.0 + 24, 800.0 - 12));
+    _children.push_back(new Spring(b2Vec2(192.0, 800.0), b2Vec2(192.0 + 24, 800.0 - 12)));
 
-    new SpeedBooster(b2Vec2(192.0 - 256.0*3, 800.0), b2Vec2(224.0 - 256.0, 792.0));
+    _children.push_back(new SpeedBooster(b2Vec2(192.0 - 256.0*3, 800.0), b2Vec2(224.0 - 256.0, 792.0)));
 
     // show graphical debugging
     uint32 flags = 0;
@@ -143,6 +146,11 @@ void World::advance()
     int32 velocityIterations = 6;
     int32 positionIterations = 2;
 
+    for (GameObject *child : _children)
+    {
+        child->advance(timeStep);
+    }
+
     Physics::world.Step(timeStep, velocityIterations, positionIterations);
 }
 
@@ -173,7 +181,7 @@ void World::draw(const Point &offset)
             SDL_RenderCopy(renderer, _atlas, &src, &dst);
         }
     }
-    
+
     // Temporary test render:
     dst.x = 192 - offset.x;
     dst.y = 788 - offset.y;

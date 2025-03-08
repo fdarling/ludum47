@@ -26,6 +26,7 @@ add_executable(${PROJECT_NAME}
     src/SpeedBooster.cpp
     src/Spring.cpp
     src/Ladder.cpp
+    src/MovingPlatform.cpp
     src/World.cpp
     src/Point.cpp
     src/Line.cpp
