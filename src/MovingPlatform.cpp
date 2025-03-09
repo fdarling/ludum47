@@ -6,18 +6,22 @@
 #include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_contact.h>
 #include <box2d/b2_prismatic_joint.h>
+
 // #include <iostream>
-MovingPlatform::MovingPlatform(const b2Vec2 &p1, const b2Vec2 &p2) : body(nullptr), fixture(nullptr), joint(nullptr), countdown(0.0)
+#include <algorithm> // for std::clamp()
+
+MovingPlatform::MovingPlatform(const b2Vec2 &p1, const b2Vec2 &p2) : body(nullptr), fixture(nullptr), state(MOVINGPLATFORM_STATE_WAIT_AT_P1), countdown(0.0)
 {
     b2Vec2 pt1 = p1;
     b2Vec2 pt2 = p2;
     pt1 *= Physics::METERS_PER_PIXEL;
     pt2 *= Physics::METERS_PER_PIXEL;
+    _p1 = pt1;
+    _p2 = pt2;
 
     b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
+    bodyDef.type = b2_kinematicBody;
     bodyDef.fixedRotation = true;
-    bodyDef.gravityScale = 1.0;
     bodyDef.position.Set(pt1.x, pt1.y);
     body = Physics::world.CreateBody(&bodyDef);
     body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
@@ -31,19 +35,11 @@ MovingPlatform::MovingPlatform(const b2Vec2 &p1, const b2Vec2 &p2) : body(nullpt
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &boxShape;
     fixtureDef.density = 1.0;
-    fixtureDef.friction = 0.0;
+    fixtureDef.friction = 1.0;
 
     fixture = body->CreateFixture(&fixtureDef);
 
-    b2Vec2 elevator_dir = pt2 - pt1;
-    const float elevator_len = elevator_dir.Normalize();
-
-    b2PrismaticJointDef testJointDef;
-    testJointDef.Initialize(world.groundBody, body, pt1, elevator_dir);
-    testJointDef.enableLimit = true;
-    testJointDef.lowerTranslation = 0.0;
-    testJointDef.upperTranslation = elevator_len;
-    joint = Physics::world.CreateJoint(&testJointDef);
+    body->SetLinearVelocity(b2Vec2(0.0, 3.0));
 }
 
 int MovingPlatform::type() const
@@ -53,31 +49,128 @@ int MovingPlatform::type() const
 
 void MovingPlatform::advance(float ms)
 {
-    (void)ms;
-    // countdown -= ms;
-    // if (countdown < 0.0)
-        // countdown = 0.0;
+    // advance timer
+    countdown -= ms;
+    if (countdown < 0.0)
+        countdown = 0.0;
 
-    b2Vec2 vel = body->GetLinearVelocity();
-    // std::cout << "vel.y = " << vel.y << std::endl;
-    // if (countdown == 0.0)
-    if (std::abs(vel.y) < 0.0001)
+    // platform constants
+    static const float MIN_SPEED = 0.05;
+    static const float MAX_SPEED = 3.0;
+    static const float WAIT_SECONDS = 0.25;
+    static const float ACCEL_DISTANCE = 32.0*Physics::METERS_PER_PIXEL;
+
+    // figure out accel/decel reference point (and distance to/from it)
+    const bool use_p2_as_reference = (state >= MOVINGPLATFORM_STATE_CRUISE_FROM_P1_TO_P2);
+    const b2Vec2 ref_distance_vec  = (use_p2_as_reference ? _p2 : _p1) - body->GetPosition();
+    const b2Vec2 ref_distance_vec2 = (use_p2_as_reference ? _p1 : _p2) - body->GetPosition();
+    const float ref_distance  = ref_distance_vec.Length();
+    const float ref_distance2 = ref_distance_vec2.Length();
+
+    // figure out what speed we'll be using
+    const float speed_ratio = std::clamp(ref_distance/ACCEL_DISTANCE, 0.0f, 1.0f);
+    const float chosen_speed = std::max(MIN_SPEED, MAX_SPEED*speed_ratio);
+
+    // calculate speed/direction to move in
+    b2Vec2 chosen_vel = _p2 - _p1;
+    if (!use_p2_as_reference)
+        chosen_vel *= -1.0;
+    chosen_vel.Normalize();
+    chosen_vel *= chosen_speed;
+
+    // print debugging information
+    // static int old_state = state;
+    // if (state != old_state)
+    // {
+        // std::cout << "state = " << state << "; chosen_speed = " << chosen_speed << "; chosen_vel = (" << chosen_vel.x << ", " << chosen_vel.y << ")" << std::endl;
+    // }
+    // old_state = state;
+
+    switch (state)
     {
-        // std::cout << "GOTTI" << std::endl;
-        const b2Vec2 pos = body->GetPosition();
-        b2Vec2 dir1 = pos - joint->GetAnchorA();
-        b2Vec2 dir2 = pos - joint->GetAnchorB();
-        
-        // const bool a_is_closer = (dir1.Length() < dir2.Length());
-        
-        dir1.Normalize();
-        dir2.Normalize();
-        dir1 *= 5.0;
-        dir2 *= 5.0;
-        
-        // vel.y = std::copysign(5.0, a_is_closer ? dir2.y : dir1.y);
-        // std::cout << "NEW vel.y = " << (a_is_closer ? dir2 : dir1).y << std::endl;
-        // body->SetLinearVelocity(a_is_closer ? dir2 : dir1);
-        body->SetGravityScale(-std::copysign(1.0, body->GetGravityScale()));
+        case MOVINGPLATFORM_STATE_CRUISE_FROM_P2_TO_P1: // 0
+        if (chosen_speed < MAX_SPEED)
+        {
+            state = MOVINGPLATFORM_STATE_DECEL_TOWARDS_P1;
+        }
+        break;
+
+        case MOVINGPLATFORM_STATE_DECEL_TOWARDS_P1: // 1
+        if (chosen_speed <= MIN_SPEED)
+        {
+            state = MOVINGPLATFORM_STATE_WAIT_AT_P1;
+            countdown = WAIT_SECONDS;
+            chosen_vel.SetZero();
+            // body->SetTransform(_p1, 0.0);
+        }
+        break;
+
+        case MOVINGPLATFORM_STATE_WAIT_AT_P1: // 2
+        if (countdown == 0.0)
+        {
+            state = MOVINGPLATFORM_STATE_ACCEL_AWAY_FROM_P1;
+            chosen_vel *= -1.0;
+        }
+        else
+        {
+            chosen_vel.SetZero();
+        }
+        break;
+
+        case MOVINGPLATFORM_STATE_ACCEL_AWAY_FROM_P1: // 3
+        chosen_vel *= -1.0;
+        if (ref_distance2 < ref_distance)
+        {
+            state = MOVINGPLATFORM_STATE_DECEL_TOWARDS_P2;
+        }
+        else if (chosen_speed >= MAX_SPEED)
+        {
+            state = MOVINGPLATFORM_STATE_CRUISE_FROM_P1_TO_P2;
+        }
+        break;
+
+        case MOVINGPLATFORM_STATE_CRUISE_FROM_P1_TO_P2: // 4
+        if (chosen_speed < MAX_SPEED)
+        {
+            state = MOVINGPLATFORM_STATE_DECEL_TOWARDS_P2;
+        }
+        break;
+
+        case MOVINGPLATFORM_STATE_DECEL_TOWARDS_P2: // 5
+        if (chosen_speed <= MIN_SPEED)
+        {
+            state = MOVINGPLATFORM_STATE_WAIT_AT_P2;
+            countdown = WAIT_SECONDS;
+            chosen_vel.SetZero();
+            // body->SetTransform(_p2, 0.0);
+        }
+        break;
+
+        case MOVINGPLATFORM_STATE_WAIT_AT_P2: // 6
+        if (countdown == 0.0)
+        {
+            state = MOVINGPLATFORM_STATE_ACCEL_AWAY_FROM_P2;
+            chosen_vel *= -1.0;
+        }
+        else
+        {
+            chosen_vel.SetZero();
+        }
+        break;
+
+        case MOVINGPLATFORM_STATE_ACCEL_AWAY_FROM_P2: // 7
+        chosen_vel *= -1.0;
+        if (ref_distance2 < ref_distance)
+        {
+            state = MOVINGPLATFORM_STATE_DECEL_TOWARDS_P1;
+        }
+        else if (chosen_speed >= MAX_SPEED)
+        {
+            state = MOVINGPLATFORM_STATE_CRUISE_FROM_P2_TO_P1;
+        }
+        break;
     }
+
+    // apply chosen velocity
+    body->SetLinearVelocity(chosen_vel);
 }
