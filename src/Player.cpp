@@ -289,7 +289,7 @@ void Player::beginContact(b2Contact *contact, b2Fixture *other)
     b2WorldManifold contactWorldManifold;
     contact->GetWorldManifold(&contactWorldManifold);
 
-    if (obj->type() == GAMEOBJECT_TYPE_WORLD || obj->type() == GAMEOBJECT_TYPE_SPEEDBOOSTER)
+    if (obj->type() == GAMEOBJECT_TYPE_WORLD || obj->type() == GAMEOBJECT_TYPE_SPEEDBOOSTER || obj->type() == GAMEOBJECT_TYPE_MOVINGPLATFORM)
     {
         // determine if we are standing on the colliding object
         if (contactWorldManifold.normal.y < 0.0 && contactWorldManifold.normal.y < -0.4)
@@ -333,7 +333,7 @@ void Player::endContact(b2Contact *contact, b2Fixture *other)
     if (!obj)
         return;
 
-    if (obj->type() == GAMEOBJECT_TYPE_WORLD || obj->type() == GAMEOBJECT_TYPE_SPEEDBOOSTER)
+    if (obj->type() == GAMEOBJECT_TYPE_WORLD || obj->type() == GAMEOBJECT_TYPE_SPEEDBOOSTER || obj->type() == GAMEOBJECT_TYPE_MOVINGPLATFORM)
     {
         standing_on.erase(other);
 
