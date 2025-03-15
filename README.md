@@ -86,6 +86,7 @@ The keyboard controls:
 * <kbd>W</kbd> or <kbd>&#8593;</kbd> for jump
 * <kbd>S</kbd> or <kbd>&#8595;</kbd> for crouch/climb down (currently not implemented)
 * <kbd>SPACE</kbd> shoot bullet (experimental)
+* <kbd>G</kbd> shoot grenade (experimental)
 * <kbd>SHIFT</kbd> jetpack thruster (experimental)
 * <kbd>CTRL</kbd> enable grappling the ceiling (experimental)
 * <kbd>ESC</kbd> will exit the game.

@@ -9,28 +9,32 @@ void GameObject::advance(float ms)
     (void)ms;
 }
 
-void GameObject::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *other)
+void GameObject::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
     (void)contact;
     (void)oldManifold;
-    (void)other;
+    (void)ourFixture;
+    (void)otherFixture;
 }
 
-void GameObject::postSolve(b2Contact *contact, const b2ContactImpulse *impulse, b2Fixture *other)
+void GameObject::postSolve(b2Contact *contact, const b2ContactImpulse *impulse, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
     (void)contact;
     (void)impulse;
-    (void)other;
+    (void)ourFixture;
+    (void)otherFixture;
 }
 
-void GameObject::beginContact(b2Contact *contact, b2Fixture *other)
+void GameObject::beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
     (void)contact;
-    (void)other;
+    (void)ourFixture;
+    (void)otherFixture;
 }
 
-void GameObject::endContact(b2Contact *contact, b2Fixture *other)
+void GameObject::endContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
     (void)contact;
-    (void)other;
+    (void)ourFixture;
+    (void)otherFixture;
 }

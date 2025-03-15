@@ -15,9 +15,9 @@ void ContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold
     GameObject * const objA = reinterpret_cast<GameObject*>(bodyA->GetUserData().pointer);
     GameObject * const objB = reinterpret_cast<GameObject*>(bodyB->GetUserData().pointer);
     if (objA)
-        objA->preSolve(contact, oldManifold, fixtureB);
+        objA->preSolve(contact, oldManifold, fixtureA, fixtureB);
     if (objB)
-        objB->preSolve(contact, oldManifold, fixtureA);
+        objB->preSolve(contact, oldManifold, fixtureB, fixtureA);
 }
 
 void ContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse)
@@ -29,9 +29,9 @@ void ContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse *impu
     GameObject * const objA = reinterpret_cast<GameObject*>(bodyA->GetUserData().pointer);
     GameObject * const objB = reinterpret_cast<GameObject*>(bodyB->GetUserData().pointer);
     if (objA)
-        objA->postSolve(contact, impulse, fixtureB);
+        objA->postSolve(contact, impulse, fixtureA, fixtureB);
     if (objB)
-        objB->postSolve(contact, impulse, fixtureA);
+        objB->postSolve(contact, impulse, fixtureB, fixtureA);
 }
 
 void ContactListener::BeginContact(b2Contact *contact)
@@ -43,9 +43,9 @@ void ContactListener::BeginContact(b2Contact *contact)
     GameObject * const objA = reinterpret_cast<GameObject*>(bodyA->GetUserData().pointer);
     GameObject * const objB = reinterpret_cast<GameObject*>(bodyB->GetUserData().pointer);
     if (objA)
-        objA->beginContact(contact, fixtureB);
+        objA->beginContact(contact, fixtureA, fixtureB);
     if (objB)
-        objB->beginContact(contact, fixtureA);
+        objB->beginContact(contact, fixtureB, fixtureA);
 }
 
 void ContactListener::EndContact(b2Contact *contact)
@@ -57,7 +57,7 @@ void ContactListener::EndContact(b2Contact *contact)
     GameObject * const objA = reinterpret_cast<GameObject*>(bodyA->GetUserData().pointer);
     GameObject * const objB = reinterpret_cast<GameObject*>(bodyB->GetUserData().pointer);
     if (objA)
-        objA->endContact(contact, fixtureB);
+        objA->endContact(contact, fixtureA, fixtureB);
     if (objB)
-        objB->endContact(contact, fixtureA);
+        objB->endContact(contact, fixtureB, fixtureA);
 }

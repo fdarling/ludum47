@@ -22,6 +22,7 @@ public:
     void climbUp();
     void climbDown();
     void shootBullet();
+    void shootGrenade();
     void setJetpack(bool on);
     void setGrappling(bool on);
     void jump();
@@ -29,8 +30,8 @@ public:
     void draw(const Point &offset) const;
     bool isStandingOnGround() const {return !standing_on.empty();}
     bool isClimbing() const {return !climbing_up.empty();}
-    void beginContact(b2Contact *contact, b2Fixture *other) override;
-    void endContact(b2Contact *contact, b2Fixture *other) override;
+    void beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture) override;
+    void endContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture) override;
     Rect rect;
     // SDL_Texture *_standingTexture;
     SDL_Texture *_walkingTexture;

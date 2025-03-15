@@ -35,6 +35,12 @@ static bool main_loop()
                     player.shootBullet();
                 }
                 break;
+
+                case SDLK_g:
+                {
+                    player.shootGrenade();
+                }
+                break;
                 // case SDLK_LEFT:
                 // camera.pos.x -= 1;
                 // break;

@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Bullet.h"
+#include "Grenade.h"
 #include "LoadTexture.h"
 //#include "MakeFixture.h" // TODO
 #include "globals.h"
@@ -109,36 +110,48 @@ void Player::climbDown()
 
 void Player::shootBullet()
 {
+    static const float BULLET_MAX_SPEED = 15.0;
     const b2Vec2 player_pos = body->GetPosition();
     const b2Vec2 player_vel = body->GetLinearVelocity();
 
-    // static const float BULLET_X_SPEED = 20.0;
-    // static const float BULLET_Y_SPEED = -3.0;
-    // b2Vec2 bullet_vel(_walkingLeft ? -BULLET_X_SPEED : BULLET_X_SPEED, player_vel.y + BULLET_Y_SPEED);
-
+    // calculate the pixel coordinates referenced from the center of the screen
     int x, y, w, h;
     SDL_GetMouseState(&x, &y);
     SDL_GetWindowSize(window, &w, &h);
     float delta_x = x - (w / 2);
     float delta_y = y - (h / 2);
 
-    static const float BULLET_MAX_SPEED = 15.0;
-    float BULLET_Y_SPEED, BULLET_X_SPEED;
-    if (delta_y == 0)
-    {
-        BULLET_Y_SPEED = 0;
-        BULLET_X_SPEED = std::copysign(BULLET_MAX_SPEED, delta_x);
-    }
-    else
-    {
-        // There is likely a way to better optimize this:
-        float ratio = std::abs(delta_x / delta_y);
-        BULLET_Y_SPEED = std::copysign(BULLET_MAX_SPEED / (1 + ratio), delta_y);
-        BULLET_X_SPEED = std::copysign(BULLET_Y_SPEED * ratio, delta_x);
-    }
-    b2Vec2 bullet_vel(BULLET_X_SPEED, player_vel.y + BULLET_Y_SPEED);
+    b2Vec2 bullet_vel(delta_x, delta_y);
+    if (!bullet_vel.IsValid())
+        bullet_vel = b2Vec2(1.0, 0.0);
+    bullet_vel.Normalize();
+    bullet_vel *= BULLET_MAX_SPEED;
+    bullet_vel += player_vel;
 
     /*Bullet * const bullet = */new Bullet(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel);
+}
+
+void Player::shootGrenade()
+{
+    static const float GRENADE_MAX_SPEED = 5.0;
+    const b2Vec2 player_pos = body->GetPosition();
+    const b2Vec2 player_vel = body->GetLinearVelocity();
+
+    // calculate the pixel coordinates referenced from the center of the screen
+    int x, y, w, h;
+    SDL_GetMouseState(&x, &y);
+    SDL_GetWindowSize(window, &w, &h);
+    float delta_x = x - (w / 2);
+    float delta_y = y - (h / 2);
+
+    b2Vec2 bullet_vel(delta_x, delta_y);
+    if (!bullet_vel.IsValid())
+        bullet_vel = b2Vec2(1.0, 0.0);
+    bullet_vel.Normalize();
+    bullet_vel *= GRENADE_MAX_SPEED;
+    bullet_vel += player_vel;
+
+    world.addChild(new Grenade(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel));
 }
 
 void Player::setJetpack(bool on)
@@ -280,9 +293,11 @@ void Player::draw(const Point &offset) const
     }*/
 }
 
-void Player::beginContact(b2Contact *contact, b2Fixture *other)
+void Player::beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
-    GameObject * const obj = reinterpret_cast<GameObject*>(other->GetBody()->GetUserData().pointer);
+    (void)ourFixture;
+
+    GameObject * const obj = reinterpret_cast<GameObject*>(otherFixture->GetBody()->GetUserData().pointer);
     if (!obj)
         return;
 
@@ -294,19 +309,19 @@ void Player::beginContact(b2Contact *contact, b2Fixture *other)
         // determine if we are standing on the colliding object
         if (contactWorldManifold.normal.y < 0.0 && contactWorldManifold.normal.y < -0.4)
         {
-            player.standing_on.insert(other);
+            player.standing_on.insert(otherFixture);
             contact->SetFriction(0.95);
         }
         else
         {
-            player.standing_on.erase(other);
+            player.standing_on.erase(otherFixture);
             contact->SetFriction(0.0);
         }
 
         if (contactWorldManifold.normal.y > 0.4)
         {
             // std::cout << "Hit Ceiling!" << std::endl;
-            b2Shape * const generic_shape = other->GetShape();
+            b2Shape * const generic_shape = otherFixture->GetShape();
             if (generic_shape->GetType() == b2Shape::e_edge)
             {
                 b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
@@ -321,23 +336,24 @@ void Player::beginContact(b2Contact *contact, b2Fixture *other)
     }
     else if (obj->type() == GAMEOBJECT_TYPE_LADDER)
     {
-        climbing_up.insert(other);
+        climbing_up.insert(otherFixture);
     }
 }
 
-void Player::endContact(b2Contact *contact, b2Fixture *other)
+void Player::endContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
     (void)contact;
+    (void)ourFixture;
 
-    GameObject * const obj = reinterpret_cast<GameObject*>(other->GetBody()->GetUserData().pointer);
+    GameObject * const obj = reinterpret_cast<GameObject*>(otherFixture->GetBody()->GetUserData().pointer);
     if (!obj)
         return;
 
     if (obj->type() == GAMEOBJECT_TYPE_WORLD || obj->type() == GAMEOBJECT_TYPE_SPEEDBOOSTER || obj->type() == GAMEOBJECT_TYPE_MOVINGPLATFORM)
     {
-        standing_on.erase(other);
+        standing_on.erase(otherFixture);
 
-        b2Shape * const generic_shape = other->GetShape();
+        b2Shape * const generic_shape = otherFixture->GetShape();
         if (generic_shape->GetType() == b2Shape::e_edge)
         {
             b2EdgeShape * const edge_shape = static_cast<b2EdgeShape*>(generic_shape);
@@ -346,6 +362,6 @@ void Player::endContact(b2Contact *contact, b2Fixture *other)
     }
     else if (obj->type() == GAMEOBJECT_TYPE_LADDER)
     {
-        climbing_up.erase(other);
+        climbing_up.erase(otherFixture);
     }
 }

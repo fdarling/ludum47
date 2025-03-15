@@ -21,6 +21,10 @@ public:
     void quit();
     void draw(const Point &cameraPos);
     void advance();
+    void addChild(GameObject *child);
+    void removeChild(GameObject *child);
+    void deleteLater(GameObject *child);
+    void performDeletions();
     b2Body *groundBody;
 protected:
     SDL_Texture *_atlas;
@@ -29,4 +33,5 @@ protected:
     DrawPhysics _debugDraw;
     ContactListener _contactListener;
     std::vector<GameObject*> _children;
+    std::vector<GameObject*> _deleteLater;
 };

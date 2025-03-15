@@ -35,11 +35,12 @@ int Spring::type() const
     return GAMEOBJECT_TYPE_SPRING;
 }
 
-void Spring::beginContact(b2Contact *contact, b2Fixture *other)
+void Spring::beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
     (void)contact;
+    (void)ourFixture;
 
-    GameObject * const obj = reinterpret_cast<GameObject*>(other->GetBody()->GetUserData().pointer);
+    GameObject * const obj = reinterpret_cast<GameObject*>(otherFixture->GetBody()->GetUserData().pointer);
     if (!obj)
         return;
 
@@ -54,12 +55,12 @@ void Spring::beginContact(b2Contact *contact, b2Fixture *other)
         // contact->SetRestitution(1.5); // bounce factor
 
         // finite energy addition method
-        //// contact->SetRestitution(0.0); // TODO: dead-stop first for impulse consistency?
+        // contact->SetRestitution(0.0); // TODO: dead-stop first for impulse consistency?
         // other->GetBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0, -5.0), true); // TODO should be considering mass of target?
 
         // constant initial speed method
-        b2Vec2 v = other->GetBody()->GetLinearVelocity();
+        b2Vec2 v = otherFixture->GetBody()->GetLinearVelocity();
         v.y = -7.0;
-        other->GetBody()->SetLinearVelocity(v);
+        otherFixture->GetBody()->SetLinearVelocity(v);
     }
 }

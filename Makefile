@@ -21,6 +21,7 @@ SOURCES = \
 	src/DrawPhysics.cpp \
 	src/Player.cpp \
 	src/Bullet.cpp \
+	src/Grenade.cpp \
 	src/SpeedBooster.cpp \
 	src/Spring.cpp \
 	src/Ladder.cpp \

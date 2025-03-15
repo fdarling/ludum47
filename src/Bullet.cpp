@@ -33,11 +33,12 @@ int Bullet::type() const
     return GAMEOBJECT_TYPE_BULLET;
 }
 
-void Bullet::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *other)
+void Bullet::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
     (void)oldManifold;
+    (void)ourFixture;
 
-    GameObject * const obj = reinterpret_cast<GameObject*>(other->GetBody()->GetUserData().pointer);
+    GameObject * const obj = reinterpret_cast<GameObject*>(otherFixture->GetBody()->GetUserData().pointer);
     if (!obj)
         return;
 

@@ -11,6 +11,8 @@
 
 #include <box2d/b2_body.h>
 
+#include <algorithm>
+
 World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_GetTicks())
 {
     // make body
@@ -84,14 +86,14 @@ World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_Ge
     MakeFixture(groundBody, points);
 
     // add a ladder
-    _children.push_back(new Ladder(b2Vec2(32+288.0, 576.0 - 64.0), b2Vec2(32+304.0, 784.0 - 92.0)));
+    addChild(new Ladder(b2Vec2(32+288.0, 576.0 - 64.0), b2Vec2(32+304.0, 784.0 - 92.0)));
 
-    _children.push_back(new MovingPlatform(b2Vec2(320.0 - 128.0, 512.0 - 96.0), b2Vec2(336.0 - 64.0, 692.0 - 96.0)));
+    addChild(new MovingPlatform(b2Vec2(320.0 - 128.0, 512.0 - 96.0), b2Vec2(336.0 - 64.0, 692.0 - 96.0)));
 
     // add a spring
-    _children.push_back(new Spring(b2Vec2(192.0, 800.0), b2Vec2(192.0 + 24, 800.0 - 12)));
+    addChild(new Spring(b2Vec2(192.0, 800.0), b2Vec2(192.0 + 24, 800.0 - 12)));
 
-    _children.push_back(new SpeedBooster(b2Vec2(192.0 - 256.0*3, 800.0), b2Vec2(224.0 - 256.0, 792.0)));
+    addChild(new SpeedBooster(b2Vec2(192.0 - 256.0*3, 800.0), b2Vec2(224.0 - 256.0, 792.0)));
 
     // show graphical debugging
     uint32 flags = 0;
@@ -150,8 +152,39 @@ void World::advance()
     {
         child->advance(timeStep);
     }
+    performDeletions();
 
     Physics::world.Step(timeStep, velocityIterations, positionIterations);
+}
+
+void World::addChild(GameObject *child)
+{
+    _children.push_back(child);
+}
+
+void World::removeChild(GameObject *child)
+{
+    std::vector<GameObject*>::iterator it = std::find(_children.begin(), _children.end(), child);
+    if (it != _children.end())
+        _children.erase(it);
+}
+
+void World::deleteLater(GameObject *child)
+{
+    _deleteLater.push_back(child);
+}
+
+void World::performDeletions()
+{
+    for (GameObject *child : _deleteLater)
+    {
+        std::vector<GameObject*>::iterator it = std::find(_children.begin(), _children.end(), child);
+        if (it != _children.end())
+        {
+            _children.erase(it);
+            delete child;
+        }
+    }
 }
 
 void World::draw(const Point &offset)

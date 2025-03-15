@@ -11,7 +11,7 @@ class SpeedBooster : public GameObject
 public:
     SpeedBooster(const b2Vec2 &p1, const b2Vec2 &p2);
     int type() const override;
-    void beginContact(b2Contact *contact, b2Fixture *other) override;
+    void beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture) override;
 public:
     b2Body *body;
     b2Fixture *fixture;

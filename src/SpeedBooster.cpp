@@ -43,9 +43,11 @@ int SpeedBooster::type() const
     return GAMEOBJECT_TYPE_SPEEDBOOSTER;
 }
 
-void SpeedBooster::beginContact(b2Contact *contact, b2Fixture *other)
+void SpeedBooster::beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
-    GameObject * const obj = reinterpret_cast<GameObject*>(other->GetBody()->GetUserData().pointer);
+    (void)ourFixture;
+
+    GameObject * const obj = reinterpret_cast<GameObject*>(otherFixture->GetBody()->GetUserData().pointer);
     if (!obj)
         return;
 
