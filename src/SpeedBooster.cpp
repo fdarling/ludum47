@@ -1,10 +1,9 @@
 #include "SpeedBooster.h"
 #include "MakeFixture.h"
+#include "DrawFixtures.h"
 #include "globals.h"
 
 #include <box2d/b2_body.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_contact.h>
 
 SpeedBooster::SpeedBooster(const b2Vec2 &p1, const b2Vec2 &p2) : body(nullptr), fixture(nullptr)
@@ -41,6 +40,12 @@ SpeedBooster::SpeedBooster(const b2Vec2 &p1, const b2Vec2 &p2) : body(nullptr), 
 int SpeedBooster::type() const
 {
     return GAMEOBJECT_TYPE_SPEEDBOOSTER;
+}
+
+void SpeedBooster::draw(const Point &offset) const
+{
+    static const SDL_Color COLOR = {255, 255, 255, 255};
+    DrawFixtures(offset, body->GetFixtureList(), COLOR);
 }
 
 void SpeedBooster::beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture)

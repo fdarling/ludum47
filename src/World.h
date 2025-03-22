@@ -19,8 +19,8 @@ public:
     int type() const;
     bool init();
     void quit();
-    void draw(const Point &cameraPos);
-    void advance();
+    void draw(const Point &offset) const override;
+    void advance(float ms) override;
     void addChild(GameObject *child);
     void removeChild(GameObject *child);
     void deleteLater(GameObject *child);
@@ -29,7 +29,6 @@ public:
 protected:
     SDL_Texture *_atlas;
     // SDL_Texture *_bg;
-    Uint32 _lastTime;
     DrawPhysics _debugDraw;
     ContactListener _contactListener;
     std::vector<GameObject*> _children;

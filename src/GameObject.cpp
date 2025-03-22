@@ -9,6 +9,11 @@ void GameObject::advance(float ms)
     (void)ms;
 }
 
+void GameObject::draw(const Point &offset) const
+{
+    (void)offset;
+}
+
 void GameObject::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
     (void)contact;

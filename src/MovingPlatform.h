@@ -12,6 +12,7 @@ public:
     MovingPlatform(const b2Vec2 &p, const b2Vec2 &v);
     int type() const override;
     void advance(float ms) override;
+    void draw(const Point &offset) const override;
 public:
     enum MovingPlatformState
     {

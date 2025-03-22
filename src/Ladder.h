@@ -11,6 +11,7 @@ class Ladder : public GameObject
 public:
     Ladder(const b2Vec2 &p1, const b2Vec2 &p2);
     int type() const override;
+    void draw(const Point &offset) const override;
 public:
     b2Body *body;
     b2Fixture *fixture;

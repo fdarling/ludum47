@@ -5,15 +5,18 @@
 #include "SpeedBooster.h"
 #include "LoadTexture.h"
 #include "MakeFixture.h"
+#include "DrawFixtures.h"
 #include "globals.h"
 
 #include <SDL2/SDL.h>
 
 #include <box2d/b2_body.h>
+#include <box2d/b2_fixture.h>
+#include <box2d/b2_edge_shape.h>
 
 #include <algorithm>
 
-World::World() : groundBody(NULL), /*_atlas(NULL), _bg(NULL), */_lastTime(SDL_GetTicks())
+World::World() : groundBody(NULL) /*, _atlas(NULL), _bg(NULL) */
 {
     // make body
     b2BodyDef groundBodyDef;
@@ -140,21 +143,13 @@ void World::quit()
     SDL_DestroyTexture(_atlas);*/
 }
 
-void World::advance()
+void World::advance(float ms)
 {
-    const Uint32 newTime = SDL_GetTicks();
-    const float timeStep = static_cast<float>(newTime - _lastTime) / 1000.0;
-    _lastTime = newTime;
-    int32 velocityIterations = 6;
-    int32 positionIterations = 2;
-
     for (GameObject *child : _children)
     {
-        child->advance(timeStep);
+        child->advance(ms);
     }
     performDeletions();
-
-    Physics::world.Step(timeStep, velocityIterations, positionIterations);
 }
 
 void World::addChild(GameObject *child)
@@ -187,9 +182,12 @@ void World::performDeletions()
     }
 }
 
-void World::draw(const Point &offset)
+void World::draw(const Point &offset) const
 {
     SDL_SetRenderDrawColor(renderer, 64, 64, 64, 128);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+    // draw background grid
     for (int y = -TILE_HEIGHT; y < SCREEN_HEIGHT + TILE_HEIGHT; y += TILE_HEIGHT)
     {
         const int y_offset = offset.y%TILE_HEIGHT;
@@ -200,6 +198,8 @@ void World::draw(const Point &offset)
         const int x_offset = offset.x%TILE_WIDTH;
         SDL_RenderDrawLine(renderer, x-x_offset, 0, x-x_offset, SCREEN_HEIGHT-1);
     }
+
+    // draw bricks as background
     static const int tile_size = 12;
     SDL_Rect src = {6 * tile_size, tile_size, tile_size, tile_size};
     SDL_Rect dst = {0, 0, tile_size, tile_size};
@@ -230,6 +230,16 @@ void World::draw(const Point &offset)
     SDL_RenderCopy(renderer, _atlas, &src, &dst);
     dst.x = 120 - offset.x + tile_size;
     SDL_RenderCopy(renderer, _atlas, &src, &dst);
+
+    // draw the floor
+    static const SDL_Color COLOR = {255, 255, 255, 255};
+    DrawBody(offset, groundBody, COLOR);
+
+    // draw the rest of the (non-player) game objects
+    for (GameObject *child : _children)
+    {
+        child->draw(offset);
+    }
 
     /*static const int LAST_ROW = SCREEN_HEIGHT/TILE_HEIGHT;
     static const int LAST_COL = SCREEN_WIDTH/TILE_WIDTH;

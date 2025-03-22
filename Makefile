@@ -19,6 +19,7 @@ SOURCES = \
 	src/LoadTexture.cpp \
 	src/ContactListener.cpp \
 	src/DrawPhysics.cpp \
+	src/DrawFixtures.cpp \
 	src/Player.cpp \
 	src/Bullet.cpp \
 	src/Grenade.cpp \

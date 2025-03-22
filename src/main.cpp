@@ -16,6 +16,8 @@
 #include "Line.h"
 #include "globals.h"
 
+static Uint32 _lastTime;
+
 static bool main_loop()
 {
     // process queued events
@@ -111,9 +113,19 @@ static bool main_loop()
     player.draw(camera.pos);
 
     // process physics (done here because of debug output)
-    Physics::world.DebugDraw();
-    world.advance();
-    player.advance();
+    // Physics::world.DebugDraw();
+    {
+        const Uint32 newTime = SDL_GetTicks();
+        const float timeStep = static_cast<float>(newTime - _lastTime) / 1000.0;
+        _lastTime = newTime;
+        int32 velocityIterations = 6;
+        int32 positionIterations = 2;
+
+        world.advance(timeStep);
+        player.advance();
+
+        Physics::world.Step(timeStep, velocityIterations, positionIterations);
+    }
 
     // synchronize player to physics body
     {
@@ -219,6 +231,7 @@ int main(int, char **)
     }
 
     // run main loop
+    _lastTime = SDL_GetTicks();
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop_arg(main_loop_wrapper, NULL, -1, 1);
 #else

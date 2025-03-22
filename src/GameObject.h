@@ -5,6 +5,9 @@ class b2Manifold; // forward declaration instead of #include <box2d/b2_collision
 class b2ContactImpulse; // forward declaration instead of #include <box2d/b2_world_callbacks.h>
 class b2Fixture; // forward declaration instead of #include <box2d/b2_fixture.h>
 
+template <class> class PointBase;
+typedef PointBase<int> Point;
+
 class GameObject
 {
 public:
@@ -12,6 +15,7 @@ public:
     virtual ~GameObject();
     virtual int type() const = 0;
     virtual void advance(float ms);
+    virtual void draw(const Point &offset) const;
     virtual void preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *ourFixture, b2Fixture *otherFixture);
     virtual void postSolve(b2Contact *contact, const b2ContactImpulse *impulse, b2Fixture *ourFixture, b2Fixture *otherFixture);
     virtual void beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture);

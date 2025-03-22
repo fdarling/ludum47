@@ -1,4 +1,5 @@
 #include "Ladder.h"
+#include "DrawFixtures.h"
 #include "globals.h"
 
 #include <box2d/b2_body.h>
@@ -32,4 +33,10 @@ Ladder::Ladder(const b2Vec2 &p1, const b2Vec2 &p2) : body(nullptr), fixture(null
 int Ladder::type() const
 {
     return GAMEOBJECT_TYPE_LADDER;
+}
+
+void Ladder::draw(const Point &offset) const
+{
+    static const SDL_Color COLOR = {255, 255, 0, 255};
+    DrawFixtures(offset, body->GetFixtureList(), COLOR);
 }

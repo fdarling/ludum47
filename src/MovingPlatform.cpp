@@ -1,8 +1,8 @@
 #include "MovingPlatform.h"
+#include "DrawFixtures.h"
 #include "globals.h"
 
 #include <box2d/b2_body.h>
-#include <box2d/b2_fixture.h>
 #include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_contact.h>
 #include <box2d/b2_prismatic_joint.h>
@@ -173,4 +173,10 @@ void MovingPlatform::advance(float ms)
 
     // apply chosen velocity
     body->SetLinearVelocity(chosen_vel);
+}
+
+void MovingPlatform::draw(const Point &offset) const
+{
+    static const SDL_Color COLOR = {255, 0, 0, 255};
+    DrawBody(offset, body, COLOR);
 }

@@ -27,7 +27,7 @@ public:
     void setGrappling(bool on);
     void jump();
     void advance();
-    void draw(const Point &offset) const;
+    void draw(const Point &offset) const override;
     bool isStandingOnGround() const {return !standing_on.empty();}
     bool isClimbing() const {return !climbing_up.empty();}
     void beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture) override;

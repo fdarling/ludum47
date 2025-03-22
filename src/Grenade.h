@@ -15,6 +15,7 @@ public:
     ~Grenade();
     int type() const override;
     void advance(float ms) override;
+    void draw(const Point &offset) const;
     void preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *ourFixture, b2Fixture *otherFixture) override;
     void beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture) override;
     void endContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture) override;

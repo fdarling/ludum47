@@ -128,7 +128,8 @@ void Player::shootBullet()
     bullet_vel *= BULLET_MAX_SPEED;
     bullet_vel += player_vel;
 
-    /*Bullet * const bullet = */new Bullet(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel);
+    Bullet * const bullet = new Bullet(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel);
+    world.addChild(bullet);
 }
 
 void Player::shootGrenade()

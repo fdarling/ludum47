@@ -1,10 +1,14 @@
 #include "Grenade.h"
+#include "DrawFixtures.h"
 #include "globals.h"
 
 #include <box2d/b2_body.h>
 #include <box2d/b2_fixture.h>
 #include <box2d/b2_circle_shape.h>
 #include <box2d/b2_contact.h>
+
+static const float GRENADE_RADIUS_IN_PIXELS = 8.0;
+static const SDL_Color GRENADE_COLOR = {128, 165, 32, 255};
 
 Grenade::Grenade(const b2Vec2 &p, const b2Vec2 &v) : body(nullptr), bombFixture(nullptr), radiusFixture(nullptr), bomb_timer(2.0)
 {
@@ -16,7 +20,7 @@ Grenade::Grenade(const b2Vec2 &p, const b2Vec2 &v) : body(nullptr), bombFixture(
     body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 
     b2CircleShape circleShape;
-    circleShape.m_radius = 8.0*Physics::METERS_PER_PIXEL;
+    circleShape.m_radius = GRENADE_RADIUS_IN_PIXELS*Physics::METERS_PER_PIXEL;
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &circleShape;
@@ -66,6 +70,11 @@ void Grenade::advance(float ms)
             other_body->ApplyLinearImpulseToCenter(impulse_vec, true);
         }
     }
+}
+
+void Grenade::draw(const Point &offset) const
+{
+    DrawFixture(offset, bombFixture, GRENADE_COLOR);
 }
 
 void Grenade::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *ourFixture, b2Fixture *otherFixture)
