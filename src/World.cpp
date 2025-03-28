@@ -89,14 +89,15 @@ World::World() : groundBody(NULL) /*, _atlas(NULL), _bg(NULL) */
     MakeFixture(groundBody, points);
 
     // add a ladder
-    addChild(new Ladder(b2Vec2(32+288.0, 576.0 - 64.0), b2Vec2(32+304.0, 784.0 - 92.0)));
+    addChild(std::static_pointer_cast<GameObject>(std::make_shared<Ladder>(b2Vec2(32+288.0, 576.0 - 64.0), b2Vec2(32+304.0, 784.0 - 92.0))));
 
-    addChild(new MovingPlatform(b2Vec2(320.0 - 128.0, 512.0 - 96.0), b2Vec2(336.0 - 64.0, 692.0 - 96.0)));
+    // add a platform
+    addChild(std::static_pointer_cast<GameObject>(std::make_shared<MovingPlatform>(b2Vec2(320.0 - 128.0, 512.0 - 96.0), b2Vec2(336.0 - 64.0, 692.0 - 96.0))));
 
     // add a spring
-    addChild(new Spring(b2Vec2(192.0, 800.0), b2Vec2(192.0 + 24, 800.0 - 12)));
+    addChild(std::static_pointer_cast<GameObject>(std::make_shared<Spring>(b2Vec2(192.0, 800.0), b2Vec2(192.0 + 24, 800.0 - 12))));
 
-    addChild(new SpeedBooster(b2Vec2(192.0 - 256.0*3, 800.0), b2Vec2(224.0 - 256.0, 792.0)));
+    addChild(std::static_pointer_cast<GameObject>(std::make_shared<SpeedBooster>(b2Vec2(192.0 - 256.0*3, 800.0), b2Vec2(224.0 - 256.0, 792.0))));
 
     // show graphical debugging
     uint32 flags = 0;
@@ -145,39 +146,58 @@ void World::quit()
 
 void World::advance(float ms)
 {
-    for (GameObject *child : _children)
+    for (std::shared_ptr<GameObject> &child : _children)
     {
         child->advance(ms);
     }
     performDeletions();
 }
 
-void World::addChild(GameObject *child)
+void World::addChild(std::shared_ptr<GameObject> child)
 {
     _children.push_back(child);
 }
 
-void World::removeChild(GameObject *child)
+void World::removeChild(std::weak_ptr<GameObject> child)
 {
-    std::vector<GameObject*>::iterator it = std::find(_children.begin(), _children.end(), child);
+    std::shared_ptr<GameObject> ptr = child.lock();
+    if (!ptr)
+        return;
+    std::vector< std::shared_ptr<GameObject> >::iterator it = std::find(_children.begin(), _children.end(), ptr);
     if (it != _children.end())
         _children.erase(it);
 }
 
-void World::deleteLater(GameObject *child)
+std::weak_ptr<GameObject> World::findChild(GameObject *child)
+{
+    std::weak_ptr<GameObject> result;
+    for (std::shared_ptr<GameObject> &candidate : _children)
+    {
+        if (candidate.get() == child)
+        {
+            result = std::weak_ptr<GameObject>(candidate);
+            break;
+        }
+    }
+    return result;
+}
+
+void World::deleteLater(std::weak_ptr<GameObject> child)
 {
     _deleteLater.push_back(child);
 }
 
 void World::performDeletions()
 {
-    for (GameObject *child : _deleteLater)
+    for (std::weak_ptr<GameObject> &child : _deleteLater)
     {
-        std::vector<GameObject*>::iterator it = std::find(_children.begin(), _children.end(), child);
+        std::shared_ptr<GameObject> ptr = child.lock();
+        if (!ptr)
+            continue;
+        std::vector< std::shared_ptr<GameObject> >::iterator it = std::find(_children.begin(), _children.end(), ptr);
         if (it != _children.end())
         {
             _children.erase(it);
-            delete child;
         }
     }
 }
@@ -236,7 +256,7 @@ void World::draw(const Point &offset) const
     DrawBody(offset, groundBody, COLOR);
 
     // draw the rest of the (non-player) game objects
-    for (GameObject *child : _children)
+    for (const std::shared_ptr<GameObject> &child : _children)
     {
         child->draw(offset);
     }

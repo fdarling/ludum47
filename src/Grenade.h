@@ -3,10 +3,22 @@
 #include "GameObject.h"
 
 #include <set>
+#include <memory>
 
 class b2Vec2; // forward declaration instead of #include <box2d/b2_math.h>
 class b2Body; // forward declaration instead of #include <box2d/b2_body.h>
 class b2Fixture; // forward declaration instead of #include <box2d/b2_fixture.h>
+
+struct WeakBodyPtrLess
+{
+    bool operator()(const std::weak_ptr<b2Body> &a, const std::weak_ptr<b2Body> &b) const
+    {
+        b2Body * const a_ptr = a.lock().get();
+        b2Body * const b_ptr = b.lock().get();
+        // std::cout << "comparing: " << a_ptr << "," << b_ptr << std::endl;
+        return std::less<void*>()(a_ptr, b_ptr);
+    }
+};
 
 class Grenade : public GameObject
 {
@@ -24,5 +36,5 @@ public:
     b2Fixture *bombFixture;
     b2Fixture *radiusFixture;
     float bomb_timer;
-    std::set<b2Body*> within_radius;
+    std::set< std::weak_ptr<b2Body>, WeakBodyPtrLess > within_radius;
 };

@@ -33,7 +33,6 @@ extern SDL_Window *window;
 extern SDL_Renderer *renderer;
 // extern Physics physics;
 extern World world;
-extern Player player;
 extern Camera camera;
 
 enum GameObjectType

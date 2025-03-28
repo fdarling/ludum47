@@ -56,9 +56,15 @@ void Grenade::advance(float ms)
     const bool is_expired = (bomb_timer == 0.0);
     if (is_expired && !was_expired)
     {
-        // world.deleteLater(this);
-        for (b2Body *other_body : within_radius)
         {
+            std::weak_ptr<GameObject> self = world.findChild(this);
+            world.deleteLater(self);
+        }
+        for (std::weak_ptr<b2Body> other_body_weak : within_radius)
+        {
+            std::shared_ptr<b2Body> other_body = other_body_weak.lock();
+            if (!other_body)
+                continue;
             b2Vec2 impulse_vec = other_body->GetPosition() - body->GetPosition();
             if (!impulse_vec.IsValid())
                 continue;
@@ -80,7 +86,7 @@ void Grenade::draw(const Point &offset) const
 void Grenade::preSolve(b2Contact *contact, const b2Manifold *oldManifold, b2Fixture *ourFixture, b2Fixture *otherFixture)
 {
     (void)oldManifold;
-    
+
     if (ourFixture != bombFixture)
         return;
 
@@ -102,7 +108,18 @@ void Grenade::beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture 
     if (ourFixture != radiusFixture)
         return;
 
-    within_radius.insert(otherFixture->GetBody());
+    GameObject * const obj = reinterpret_cast<GameObject*>(otherFixture->GetBody()->GetUserData().pointer);
+    if (!obj)
+        return;
+
+    std::weak_ptr<GameObject> obj_weak_ptr = world.findChild(obj);
+    std::shared_ptr<GameObject> obj_shared_ptr = obj_weak_ptr.lock();
+    if (!obj_shared_ptr)
+        return;
+    b2Body * const other_body = otherFixture->GetBody();
+    std::shared_ptr<b2Body> body_shared_ptr(obj_shared_ptr, other_body);
+
+    within_radius.insert(std::weak_ptr<b2Body>(body_shared_ptr));
 }
 
 void Grenade::endContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *otherFixture)
@@ -112,5 +129,16 @@ void Grenade::endContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *o
     if (ourFixture != radiusFixture)
         return;
 
-    within_radius.erase(otherFixture->GetBody());
+    GameObject * const obj = reinterpret_cast<GameObject*>(otherFixture->GetBody()->GetUserData().pointer);
+    if (!obj)
+        return;
+
+    std::weak_ptr<GameObject> obj_weak_ptr = world.findChild(obj);
+    std::shared_ptr<GameObject> obj_shared_ptr = obj_weak_ptr.lock();
+    if (!obj_shared_ptr)
+        return;
+    b2Body * const other_body = otherFixture->GetBody();
+    std::shared_ptr<b2Body> body_shared_ptr(obj_shared_ptr, other_body);
+
+    within_radius.erase(std::weak_ptr<b2Body>(body_shared_ptr));
 }

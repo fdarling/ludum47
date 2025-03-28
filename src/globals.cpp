@@ -12,4 +12,3 @@ SDL_Renderer *renderer = NULL;
 // Physics physics;
 World world;
 Camera camera;
-Player player;

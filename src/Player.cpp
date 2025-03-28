@@ -55,7 +55,7 @@ bool Player::init()
 
 void Player::walkLeft()
 {
-    b2Vec2 vel = player.body->GetLinearVelocity();
+    b2Vec2 vel = body->GetLinearVelocity();
     // if (!standing_on.empty())
     // if (!standing_on.empty() || blocked_left_by.empty())
     {
@@ -74,7 +74,7 @@ void Player::walkLeft()
 
 void Player::walkRight()
 {
-    b2Vec2 vel = player.body->GetLinearVelocity();
+    b2Vec2 vel = body->GetLinearVelocity();
     // if (!standing_on.empty())
     // if (!standing_on.empty() || blocked_right_by.empty())
     {
@@ -94,7 +94,7 @@ void Player::climbUp()
 {
     if (!isClimbing())
         return;
-    b2Vec2 vel = player.body->GetLinearVelocity();
+    b2Vec2 vel = body->GetLinearVelocity();
     vel.y = -3.0;
     body->SetLinearVelocity(vel);
 }
@@ -103,7 +103,7 @@ void Player::climbDown()
 {
     if (!isClimbing())
         return;
-    b2Vec2 vel = player.body->GetLinearVelocity();
+    b2Vec2 vel = body->GetLinearVelocity();
     vel.y = 3.0;
     body->SetLinearVelocity(vel);
 }
@@ -128,7 +128,7 @@ void Player::shootBullet()
     bullet_vel *= BULLET_MAX_SPEED;
     bullet_vel += player_vel;
 
-    Bullet * const bullet = new Bullet(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel);
+    std::shared_ptr<GameObject> bullet = std::static_pointer_cast<GameObject>(std::make_shared<Bullet>(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel));
     world.addChild(bullet);
 }
 
@@ -152,7 +152,8 @@ void Player::shootGrenade()
     bullet_vel *= GRENADE_MAX_SPEED;
     bullet_vel += player_vel;
 
-    world.addChild(new Grenade(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel));
+    std::shared_ptr<GameObject> grenade = std::static_pointer_cast<GameObject>(std::make_shared<Grenade>(player_pos + b2Vec2(std::copysign(rect.w/2.0*Physics::METERS_PER_PIXEL, bullet_vel.x), 0.0), bullet_vel));
+    world.addChild(grenade);
 }
 
 void Player::setJetpack(bool on)
@@ -169,7 +170,7 @@ void Player::jump()
 {
     if (isStandingOnGround())
     {
-        b2Vec2 vel = player.body->GetLinearVelocity();
+        b2Vec2 vel = body->GetLinearVelocity();
         vel.y = -4.0;
         body->SetLinearVelocity(vel);
     }
@@ -248,7 +249,7 @@ void Player::advance()
 
             // constraint the player to the ceiling
             b2PrismaticJointDef testJointDef;
-            testJointDef.Initialize(world.groundBody, player.body, grab_point, edge_dir);
+            testJointDef.Initialize(world.groundBody, body, grab_point, edge_dir);
             testJointDef.enableLimit = true;
             testJointDef.lowerTranslation = -grab_point_distance + grab_start_distance;
             testJointDef.upperTranslation = -grab_point_distance + grab_end_distance;
@@ -310,12 +311,12 @@ void Player::beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *
         // determine if we are standing on the colliding object
         if (contactWorldManifold.normal.y < 0.0 && contactWorldManifold.normal.y < -0.4)
         {
-            player.standing_on.insert(otherFixture);
+            standing_on.insert(otherFixture);
             contact->SetFriction(0.95);
         }
         else
         {
-            player.standing_on.erase(otherFixture);
+            standing_on.erase(otherFixture);
             contact->SetFriction(0.0);
         }
 
@@ -331,7 +332,7 @@ void Player::beginContact(b2Contact *contact, b2Fixture *ourFixture, b2Fixture *
                 dir.Normalize();
 
                 if (std::abs(dir.y) < 0.01)
-                    player.hanging_under.insert(edge_shape);
+                    hanging_under.insert(edge_shape);
             }
         }
     }

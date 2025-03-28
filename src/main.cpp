@@ -18,6 +18,8 @@
 
 static Uint32 _lastTime;
 
+static Player *player;
+
 static bool main_loop()
 {
     // process queued events
@@ -34,13 +36,13 @@ static bool main_loop()
             {
                 case SDLK_SPACE:
                 {
-                    player.shootBullet();
+                    player->shootBullet();
                 }
                 break;
 
                 case SDLK_g:
                 {
-                    player.shootGrenade();
+                    player->shootGrenade();
                 }
                 break;
                 // case SDLK_LEFT:
@@ -50,7 +52,7 @@ static bool main_loop()
                 // camera.pos.x += 1;
                 // break;
                 // case SDLK_w:
-                // player.jump();
+                // player->jump();
                 // break;
             }
         }
@@ -62,45 +64,45 @@ static bool main_loop()
              if ((keys[SDL_SCANCODE_D] && !keys[SDL_SCANCODE_A])
               || (keys[SDL_SCANCODE_RIGHT] && !keys[SDL_SCANCODE_LEFT]))
         {
-            player.walkRight();
+            player->walkRight();
             walking_left_or_right = true;
         }
         else if ((keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_D])
               || (keys[SDL_SCANCODE_LEFT] && !keys[SDL_SCANCODE_RIGHT]))
         {
-            player.walkLeft();
+            player->walkLeft();
             walking_left_or_right = true;
         }
         if (keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_UP])
         {
-            if (player.isClimbing())
-                player.climbUp();
+            if (player->isClimbing())
+                player->climbUp();
             else
-                player.jump();
+                player->jump();
         }
         else if (keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_DOWN])
         {
-            if (player.isClimbing())
-                player.climbDown();
+            if (player->isClimbing())
+                player->climbDown();
         }
         else
         {
-            if (player.isClimbing())
+            if (player->isClimbing())
             {
-                b2Vec2 vel = player.body->GetLinearVelocity();
+                b2Vec2 vel = player->body->GetLinearVelocity();
                 vel.y = 0.0;
                 if (!walking_left_or_right)
                     vel.x = 0.0;
-                player.body->SetLinearVelocity(vel);
+                player->body->SetLinearVelocity(vel);
             }
         }
-        player.setJetpack(keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT]);
-        player.setGrappling(keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]);
+        player->setJetpack(keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT]);
+        player->setGrappling(keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]);
     }
 
     // sychronize the camera to the player
-    camera.pos.x = -SCREEN_WIDTH /2 + player.rect.x + player.rect.w/2;
-    camera.pos.y = -SCREEN_HEIGHT/2 + player.rect.y + player.rect.h/2;
+    camera.pos.x = -SCREEN_WIDTH /2 + player->rect.x + player->rect.w/2;
+    camera.pos.y = -SCREEN_HEIGHT/2 + player->rect.y + player->rect.h/2;
 
     // clear screen
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -110,7 +112,7 @@ static bool main_loop()
     world.draw(camera.pos);
 
     // draw player
-    player.draw(camera.pos);
+    player->draw(camera.pos);
 
     // process physics (done here because of debug output)
     // Physics::world.DebugDraw();
@@ -122,16 +124,16 @@ static bool main_loop()
         int32 positionIterations = 2;
 
         world.advance(timeStep);
-        player.advance();
+        player->advance();
 
         Physics::world.Step(timeStep, velocityIterations, positionIterations);
     }
 
     // synchronize player to physics body
     {
-        const b2Vec2 position = player.body->GetPosition();
-        player.rect.setCenterX(position.x * Physics::PIXELS_PER_METER);
-        player.rect.setCenterY(position.y * Physics::PIXELS_PER_METER);
+        const b2Vec2 position = player->body->GetPosition();
+        player->rect.setCenterX(position.x * Physics::PIXELS_PER_METER);
+        player->rect.setCenterY(position.y * Physics::PIXELS_PER_METER);
     }
 
     // show changes
@@ -224,7 +226,8 @@ int main(int, char **)
         fprintf(stderr, "error: world init failed!\n");
         return -1;
     }
-    if (!player.init())
+    world.addChild(std::static_pointer_cast<GameObject>(std::shared_ptr<Player>(player = new Player())));
+    if (!player->init())
     {
         fprintf(stderr, "error: player init failed!\n");
         return -1;
