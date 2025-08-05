@@ -13,7 +13,8 @@
 static const float MAX_WALK_FORCE = 150.0;
 static const float MAX_WALK_SPEED = 3.0;
 
-Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _jetpackOn(false), _grappling(false), _lastPos(rect.topLeft()), body(nullptr), fixture(nullptr), hanging_joint(nullptr)
+// Player::Player() : rect(250, 700, 20, 30), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _jetpackOn(false), _grappling(false), _lastPos(rect.topLeft()), body(nullptr), fixture(nullptr), hanging_joint(nullptr)
+Player::Player() : rect(250, 700, 32, 64), /*_standingTexture(NULL),*/ _walkingTexture(NULL), _frameIndex(0), _walkingLeft(false), _jetpackOn(false), _grappling(false), _lastPos(rect.topLeft()), body(nullptr), fixture(nullptr), hanging_joint(nullptr)
 {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
